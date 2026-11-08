@@ -103,3 +103,28 @@ test('no horizontal page scroll on the round screen', async ({ page }) => {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+test('calculator works out an answer and fills the answer box', async ({ page }) => {
+  await startCareer(page, 'Calc Cart');
+  await page.getByRole('button', { name: 'Calculator' }).click();
+  const calc = page.getByRole('dialog', { name: 'Calculator' });
+  await calc.getByLabel('Calculation').fill('25000 - 12000');
+  await calc.getByLabel('Calculation').press('Enter');
+  await expect(calc.locator('output')).toHaveText('= 13,000');
+  await calc.getByRole('button', { name: 'Use in answer' }).click();
+  await expect(page.getByLabel(/Your answer/)).toHaveValue('13000');
+  await page.getByRole('button', { name: 'Check answer' }).click();
+  await expect(page.getByText('Correct.', { exact: false })).toBeVisible();
+  // On a phone the sheet steps aside after filling the answer; reopen it. History and input are kept.
+  if (!(await calc.isVisible())) await page.getByRole('button', { name: 'Calculator' }).click();
+  await expect(calc.getByLabel('Calculation')).toHaveValue('25000 - 12000');
+  // Keypad and NPV-style powers
+  await calc.getByRole('button', { name: 'Clear' }).click();
+  await calc.getByLabel('Calculation').fill('1050/1.1^3');
+  await calc.getByRole('button', { name: '=' }).click();
+  await expect(calc.locator('output')).toHaveText('= 788.880541');
+  await calc.getByLabel('Calculation').press('Escape');
+  await expect(calc).toBeHidden();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+});

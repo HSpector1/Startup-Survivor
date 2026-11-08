@@ -6,6 +6,7 @@ import { chapterOf, loadSave, newSave, nextRound, storeSave, type Save, type Vie
 import { ReportsDialog, MonthCloseView, FinalReport } from './ui/reports';
 import { Landing, Setup, QuickChallenge, BonusLab, GlossaryPage, SourcesPage } from './ui/extras';
 import { RoundView, ConsequenceView, CheckpointView, Till } from './ui/play';
+import { Calculator } from './ui/calculator';
 
 export type Screen = 'landing' | 'setup' | 'play' | 'quick' | 'bonus' | 'glossary' | 'sources';
 
@@ -16,6 +17,7 @@ export default function App() {
   const [storeError, setStoreError] = useState<string | undefined>();
   const [screen, setScreen] = useState<Screen>('landing');
   const [reportsOpen, setReportsOpen] = useState(false);
+  const [calcOpen, setCalcOpen] = useState(false);
 
   useEffect(() => { setStoreError(storeSave(save)); }, [save]);
 
@@ -96,6 +98,7 @@ export default function App() {
             </div>
           )}
           <div className="btn-row">
+            <button className="btn" aria-expanded={calcOpen} aria-controls="calc-title" onClick={() => setCalcOpen((o) => !o)}>Calculator</button>
             {screen === 'play' && save && <button className="btn" onClick={() => setReportsOpen(true)}>Open the books</button>}
             {screen !== 'play' && save && <button className="btn primary" onClick={() => setScreen('play')}>{resumeLabel}</button>}
           </div>
@@ -142,6 +145,8 @@ export default function App() {
       </main>
 
       {save && game && <ReportsDialog open={reportsOpen} onClose={() => setReportsOpen(false)} game={game} truckName={save.truckName} />}
+
+      <Calculator open={calcOpen} onClose={() => setCalcOpen(false)} />
 
       <footer className="footer">
         Startup Survivor is an original teaching game for Auburn BUSI 7230. All businesses and numbers are fictional. No login, no tracking: progress stays in this browser.

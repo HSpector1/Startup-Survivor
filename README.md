@@ -18,7 +18,7 @@ An accounting simulation for Auburn University BUSI 7230, Cost Analysis and Syst
 | Quick Challenge | 5 rounds (R04, R10, R17, R19, R24), 5 to 8 minutes | Peer reviewers. Uses a fixed reference business. |
 | Mastery Lab | 5 optional harder cases (B1 to B5) | Extra practice. Never touches the live ledger. |
 
-The game also includes a glossary of 40 terms and a Sources & Assumptions page.
+The game also includes a calculator (top bar, every screen: parentheses, powers for NPV, percent, and "Use in answer"), a glossary of 41 terms and a Sources & Assumptions page.
 
 ## How it works
 
