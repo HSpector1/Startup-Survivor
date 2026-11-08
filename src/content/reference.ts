@@ -82,7 +82,7 @@ export const GLOSSARY: {
     definition:
       "Factoring means selling your receivables to a finance company for immediate cash, usually at a fee. Without recourse means the factor, not you, absorbs the loss if the customer never pays.",
     example:
-      "You sell the $2,400 invoice for $2,304 in cash. You record the $96 difference as a factoring expense, and the receivable leaves your books.",
+      "You sell the $2,400 invoice for $2,304 in cash. You record the $96 difference as a factoring fee (a loss on sale of the receivable), and the receivable leaves your books. This game keeps the fee inside operating income for simplicity; many companies report it below operating income, next to interest.",
     rounds: ["R21"],
   },
   {

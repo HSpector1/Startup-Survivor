@@ -1,6 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { CLOSE_AFTER, NEUTRAL, ROUND_IDS, roundPeriod, type OptionId, type RoundId } from '../engine/model';
-import { availability, projectOption, periodLabel, targetMonth, type GameState, type Projection } from '../engine/sim';
+import { availability, projectOption, projectThroughMonth4, periodLabel, targetMonth, type GameState, type HorizonProjection, type Projection } from '../engine/sim';
 import { balanceSheet, incomeStatement } from '../engine/ledger';
 import { fmt } from '../engine/money';
 import { EXECUTION_BY_POINTS, FEEDS_MONTH, executionFactors, grade, points, resolved, type MasteryRecord } from '../engine/scoring';
@@ -175,7 +175,8 @@ function Decision({ round, save, onDecide }: { round: RoundId; save: Save; onDec
   const spec = roundById(round);
   const input = gameInput(save);
   const av = useMemo(() => availability(input, round), [round, save.choices]); // eslint-disable-line react-hooks/exhaustive-deps
-  const proj = useMemo(() => OPTS.map((o) => projectOption(input, round, o)), [round, save.choices]); // eslint-disable-line react-hooks/exhaustive-deps
+  const proj = useMemo(() => OPTS.map((o) => projectOption(input, round, o)), [round, save.choices, save.mastery]); // eslint-disable-line react-hooks/exhaustive-deps
+  const horizon = useMemo(() => OPTS.map((o) => projectThroughMonth4(input, round, o)), [round, save.choices, save.mastery]); // eslint-disable-line react-hooks/exhaustive-deps
   const [pick, setPick] = useState<OptionId | null>(null);
   const m = targetMonth(round);
   const truckVariant = { A: 'used', B: 'refurbished', C: 'premium' } as const;
@@ -183,15 +184,16 @@ function Decision({ round, save, onDecide }: { round: RoundId; save: Save; onDec
   return (
     <>
       <p className="small muted" style={{ margin: 0 }}>
-        {m ? `Projected figures are pro forma for Month ${m}: they assume no new action in the rest of the month and become actual only at the close.` : 'These decisions happen after the Month 4 close. They change the balance sheet, not Month 4 profit.'}
+        {m ? `Projected figures are pro forma: they assume no new action in later rounds and become actual only at each close.${m < 4 ? ` "Months ${m}–4" adds up operating income through the Month 4 close, so investments that pay back later get a fair hearing.` : ''}` : 'These decisions happen after the Month 4 close. They change the balance sheet, not Month 4 profit.'}
       </p>
       <div className="tickets" role="group" aria-label="Choose one option">
         {OPTS.map((o, i) => {
           const opt = spec.options[i];
           const blocked = !av[o].ok;
           return (
-            <button key={o} className="ticket" aria-pressed={pick === o} aria-disabled={blocked}
-              onClick={() => !blocked && setPick(o)} aria-describedby={blocked ? `why-${o}` : undefined}>
+            <div key={o} className="ticket" role="button" tabIndex={0} aria-pressed={pick === o} aria-disabled={blocked}
+              onClick={() => !blocked && setPick(o)} aria-describedby={blocked ? `why-${o}` : undefined}
+              onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !blocked) { e.preventDefault(); setPick(o); } }}>
               <span className="letter" aria-hidden="true">{o}</span>
               {round === 'R01' && <TruckIcon variant={truckVariant[o]} className="ticket-art" />}
               <span className="title">{opt.label}</span>
@@ -199,10 +201,11 @@ function Decision({ round, save, onDecide }: { round: RoundId; save: Save; onDec
               <ul className="effect-list">{effectSummary(round, o).map((t) => <li key={t}>{t}</li>)}</ul>
               <dl>
                 {projectionRows(proj[i]).map(([k, v]) => (<span key={k} style={{ display: 'contents' }}><dt>{k}</dt><dd>{v}</dd></span>))}
+                {m !== 0 && m < 4 && horizon[i] && <><dt>Months {m}–4 operating income</dt><dd>{fmt(horizon[i]!.operatingIncome)}</dd></>}
               </dl>
               {proj[i].month !== 0 && proj[i].calc && proj[i].calc!.lost > 0 && <span className="small muted">{proj[i].calc!.lost.toLocaleString()} orders turned away for lack of capacity</span>}
               {blocked && <span className="blocked" id={`why-${o}`}>Not available: {av[o].reason}</span>}
-            </button>
+            </div>
           );
         })}
       </div>
@@ -218,13 +221,36 @@ function Decision({ round, save, onDecide }: { round: RoundId; save: Save; onDec
 
 // ---------------------------------------------------------------- consequence
 
+function HorizonCells({ h, mine, isMine }: { h: HorizonProjection; mine: HorizonProjection; isMine: boolean }) {
+  return (
+    <>
+      <td className="num"><Money c={h.operatingIncome} /> {!isMine && <span className="small"><Delta before={mine.operatingIncome} after={h.operatingIncome} /></span>}</td>
+      <td className="num"><Money c={h.cashAtMonth4} /></td>
+    </>
+  );
+}
+
+/** One plain sentence judging the choice on this month and, where it matters, through Month 4. */
+function verdict(mine: number, best: number, mineH: number | null, bestH: number, m: number): string {
+  const fair = ' A smaller number is not automatically a wrong decision: cash safety and risk matter too.';
+  if (mineH === null) {
+    return mine === best ? 'Your choice gives the highest projected operating income this month.' : `Another option projects ${fmt(best - mine)} more operating income this month.${fair}`;
+  }
+  if (mine === best && mineH === bestH) return `Your choice gives the highest projected operating income this month and through Month 4.`;
+  if (mineH === bestH) return `Another option earns ${fmt(best - mine)} more in Month ${m}, but yours projects the most operating income through Month 4: it pays back later.`;
+  if (mine === best) return `Your choice earns the most in Month ${m}, but another option projects ${fmt(bestH - mineH)} more through Month 4.${fair}`;
+  return `Another option projects ${fmt(best - mine)} more this month and ${fmt(bestH - mineH)} more through Month 4.${fair}`;
+}
+
 export function ConsequenceView({ round, save, game, onContinue }: { round: RoundId; save: Save; game: GameState; onContinue: () => void }) {
   const spec = roundById(round);
   const chosen = save.choices[round]!;
   const head = useFocusHeading(`c-${round}`);
   const prior = { ...gameInput(save), choices: Object.fromEntries(ROUND_IDS.slice(0, ROUND_IDS.indexOf(round)).map((r) => [r, save.choices[r]])) };
   const proj = useMemo(() => OPTS.map((o) => projectOption(prior, round, o)), [round]); // eslint-disable-line react-hooks/exhaustive-deps
+  const horizon = useMemo(() => OPTS.map((o) => projectThroughMonth4(prior, round, o)), [round]); // eslint-disable-line react-hooks/exhaustive-deps
   const mine = proj[OPTS.indexOf(chosen)];
+  const mineH = horizon[OPTS.indexOf(chosen)];
   const immediate = game.journal.filter((e) => e.round === round && !e.id.startsWith('M'));
   const before = balanceSheet(game.journal.filter((e) => e.round !== round));
   const after = balanceSheet(game.journal.filter((e) => !(e.round === round && e.id.startsWith('M'))));
@@ -232,6 +258,8 @@ export function ConsequenceView({ round, save, game, onContinue }: { round: Roun
   const m = targetMonth(round);
   const opt = spec.options[OPTS.indexOf(chosen)];
   const bestIncome = m ? Math.max(...proj.map((p) => p.operatingIncome!)) : 0;
+  const showH = m !== 0 && m < 4 && !!mineH;
+  const bestH = showH ? Math.max(...horizon.map((h) => h!.operatingIncome)) : 0;
 
   return (
     <article className="stack">
@@ -263,7 +291,8 @@ export function ConsequenceView({ round, save, game, onContinue }: { round: Roun
           <TableScroll>
             <table className="fin">
               <caption className="sr-only">Projected Month {m} results under each option</caption>
-              <thead><tr><th>Option</th><th className="num">Month {m} operating income</th><th className="num">Cash at Month {m} close</th><th className="num">Orders turned away</th></tr></thead>
+              <thead><tr><th>Option</th><th className="num">Month {m} operating income</th><th className="num">Cash at Month {m} close</th><th className="num">Orders turned away</th>
+                {showH && <><th className="num">Months {m}–4 operating income</th><th className="num">Cash at Month 4 close</th></>}</tr></thead>
               <tbody>
                 {proj.map((p, i) => (
                   <tr key={p.option} className={p.option === chosen ? 'sub' : undefined}>
@@ -271,16 +300,15 @@ export function ConsequenceView({ round, save, game, onContinue }: { round: Roun
                     <td className="num"><Money c={p.operatingIncome!} /> {p.option !== chosen && <span className="small"><Delta before={mine.operatingIncome!} after={p.operatingIncome!} /></span>}</td>
                     <td className="num"><Money c={p.cashAtClose!} /></td>
                     <td className="num">{p.calc?.lost.toLocaleString() ?? '0'}</td>
+                    {showH && <HorizonCells h={horizon[i]!} mine={mineH!} isMine={p.option === chosen} />}
                   </tr>
                 ))}
               </tbody>
             </table>
           </TableScroll>
           <p className="small muted" style={{ marginTop: '.75rem' }}>
-            {mine.operatingIncome === bestIncome
-              ? 'Your choice gives the highest projected operating income this month.'
-              : `Another option projects ${fmt(bestIncome - mine.operatingIncome!)} more operating income this month. A smaller number is not automatically a wrong decision: cash safety, risk and later months matter too.`}
-            {' '}Projections assume no new action for the rest of the month.
+            {verdict(mine.operatingIncome!, bestIncome, showH ? mineH!.operatingIncome : null, bestH, m as number)}
+            {' '}Projections assume no new action in later rounds; the same scenario events hit every option.
           </p>
         </section>
       )}

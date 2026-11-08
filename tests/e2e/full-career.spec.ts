@@ -21,6 +21,12 @@ async function playRound(page: Page, i: number, letter: string) {
   await page.locator('.ticket').nth('ABC'.indexOf(letter)).click();
   await page.getByRole('button', { name: `Confirm option ${letter}` }).click();
   await expect(page.getByRole('heading', { level: 1, name: new RegExp(`You chose ${letter}`) })).toBeVisible();
+  if (r.id === 'R17') {
+    // Doing nothing about waste wins Month 3 but training pays back in Month 4: the table must show both horizons.
+    await expect(page.locator('table.fin th', { hasText: 'Months 3–4 operating income' })).toBeVisible();
+    // Training (A) loses $34.80 in Month 3 but saves $0.15 on 1,100 Month 4 meals: +$130.20 through Month 4.
+    await expect(page.getByText(/another option projects \$130\.20 more through Month 4/)).toBeVisible();
+  }
   const m = CLOSE[r.id];
   if (m) {
     await page.getByRole('button', { name: `Close Month ${m}` }).click();

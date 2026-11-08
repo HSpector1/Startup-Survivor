@@ -67,4 +67,4 @@ HANDOFF.md                current state and next steps for whoever picks this up
 
 ## For teammates
 
-Start with `HANDOFF.md`. The open design questions for the team (for example, options that are dominated on pure profit) are listed at the end of `docs/IMPLEMENTATION_AUDIT.md`. The course workbooks in `Easton_Solutions_export.zip` were used only to check formulas and terminology. The game reproduces none of their content.
+Start with `HANDOFF.md`. The open design questions for the team (for example, options that are dominated on pure profit) are listed at the end of `docs/IMPLEMENTATION_AUDIT.md`. The Easton course workbooks were used only to check formulas and terminology. They were removed from the repository on 2026-11-08 (a local copy stays with the team); the game reproduces none of their content.

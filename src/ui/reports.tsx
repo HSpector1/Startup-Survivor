@@ -397,6 +397,7 @@ export function VarianceView({ game }: { game: GameState }) {
       <div className="callout">
         <p>Easton calls the contribution-based figure the net sales volume variance. Measured on revenue alone, the sales volume variance is {V(r.revenueSalesVolumeVariance)}.</p>
         <p>The bad weather cut walk-up demand. A volume shortfall from weather is not a cost the kitchen manager controls; judge the kitchen on the flexible-budget variance.</p>
+        <p>The Round 18 labor overrun appears under fixed costs because your crew is paid as a fixed monthly payroll in this model. The Round 18 knowledge check splits the same overrun the textbook way: $396 rate variance plus $360 efficiency variance = $756 U.</p>
       </div>
     </div>
   );

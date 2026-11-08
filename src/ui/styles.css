@@ -6,6 +6,8 @@
 /* ---------- tokens ---------- */
 :root {
   --ink: #1c2a2e;
+  /* Dark chrome (top bar, CFO till) stays dark in both themes. */
+  --chrome: #1c2a2e;
   --ink-2: #4a5a5e;
   --paper: #f5f6f2;
   --surface: #ffffff;
@@ -26,14 +28,14 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --ink: #e7eeeb; --ink-2: #a9b7b3; --paper: #11191b; --surface: #192326; --panel: #1f2f2c; --line: #2d3c3f;
+    --ink: #e7eeeb; --ink-2: #a9b7b3; --chrome: #0b1315; --paper: #11191b; --surface: #192326; --panel: #1f2f2c; --line: #2d3c3f;
     --chili: #f08a6c; --basil: #6bd3a0; --sky: #1d2d35; --focus: #8cb6ff; --saffron-deep: #f2b33d;
     --art-ink: #0e1518; --art-cream: #fdf1d8; --art-sky: #213a3c;
     color-scheme: dark;
   }
 }
 :root[data-theme='dark'] {
-  --ink: #e7eeeb; --ink-2: #a9b7b3; --paper: #11191b; --surface: #192326; --panel: #1f2f2c; --line: #2d3c3f;
+  --ink: #e7eeeb; --ink-2: #a9b7b3; --chrome: #0b1315; --paper: #11191b; --surface: #192326; --panel: #1f2f2c; --line: #2d3c3f;
   --chili: #f08a6c; --basil: #6bd3a0; --sky: #1d2d35; --focus: #8cb6ff; --saffron-deep: #f2b33d;
   --art-ink: #0e1518; --art-cream: #fdf1d8; --art-sky: #213a3c;
   color-scheme: dark;
@@ -74,7 +76,7 @@ button, input, select { font: inherit; color: inherit; }
 
 /* ---------- layout ---------- */
 .app { min-height: 100vh; display: flex; flex-direction: column; }
-.topbar { position: sticky; top: 0; z-index: 20; background: var(--ink); color: #f5f6f2; }
+.topbar { position: sticky; top: 0; z-index: 20; background: var(--chrome); color: #f5f6f2; border-bottom: 1px solid var(--line); }
 :root[data-theme='dark'] .topbar, :root:not([data-theme='light']) .topbar { color-scheme: dark; }
 .topbar-inner { max-width: 1280px; margin: 0 auto; padding: .55rem 16px; display: flex; gap: 1rem; align-items: center; justify-content: space-between; }
 .brand { font-family: var(--display); font-weight: 800; font-size: 1.1rem; color: #f5f6f2; background: none; border: 0; cursor: pointer; padding: .25rem 0; }
@@ -151,7 +153,7 @@ button, input, select { font: inherit; color: inherit; }
 .ticket:hover:not([aria-disabled='true']) { border-color: var(--ink-2); }
 
 /* ---------- the till (CFO dashboard) ---------- */
-.till { position: sticky; top: 72px; background: var(--ink); color: #eef3f1; border-radius: var(--r-l); padding: 18px; display: grid; gap: 14px; }
+.till { position: sticky; top: 72px; background: var(--chrome); border: 1px solid var(--line); color: #eef3f1; border-radius: var(--r-l); padding: 18px; display: grid; gap: 14px; }
 .till h2 { font-size: 1.05rem; margin: 0; color: #f5f6f2; }
 .till .big { font-family: var(--display); font-weight: 800; font-size: 2.1rem; line-height: 1; color: var(--saffron); }
 .till dl { display: grid; grid-template-columns: 1fr auto; gap: .35rem .75rem; margin: 0; font-size: .93rem; }

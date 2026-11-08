@@ -349,14 +349,15 @@ const showDelta = (d: number, unit: Unit) => (unit === 'money' ? fmt(d, { sign: 
 
 function Ticket({ opt, pressed, blocked, onPick, children }: { opt: SpecOption; pressed: boolean; blocked?: string; onPick: () => void; children?: ReactNode }) {
   return (
-    <button type="button" className="ticket" aria-pressed={pressed} aria-disabled={blocked ? true : undefined}
-      onClick={() => { if (!blocked) onPick(); }}>
+    <div className="ticket" role="button" tabIndex={0} aria-pressed={pressed} aria-disabled={blocked ? true : undefined}
+      onClick={() => { if (!blocked) onPick(); }}
+      onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !blocked) { e.preventDefault(); onPick(); } }}>
       <span className="letter">{opt.id}</span>
       <span className="title">{opt.label}</span>
       <span className="effect">{opt.effect}</span>
       {children}
       {blocked && <span className="blocked">Not available: {blocked}</span>}
-    </button>
+    </div>
   );
 }
 

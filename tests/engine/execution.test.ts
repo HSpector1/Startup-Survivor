@@ -45,3 +45,24 @@ describe('execution factors', () => {
     expect(() => runGame({ choices: REFERENCE, execution: { 1: 1.2 } })).toThrow(/Execution factor/);
   });
 });
+
+import { projectThroughMonth4 } from '../../src/engine/sim';
+import { ROUND_IDS } from '../../src/engine/model';
+
+describe('through-Month-4 projection', () => {
+  const prior = (r: string) => ({ choices: Object.fromEntries(ROUND_IDS.slice(0, ROUND_IDS.indexOf(r as never)).map((x) => [x, REFERENCE[x]])) });
+  it('reproduces the reference path: Months 1-4 operating income $3,315.10 and Month 4 cash $13,915.10', () => {
+    const p = projectThroughMonth4(prior('R01'), 'R01', 'A')!;
+    expect(p.operatingIncome).toBe(163_500 + 97_500 - 79_990 + 150_500);
+    expect(p.cashAtMonth4).toBe(1_391_510);
+  });
+  it('R17A training costs more than it saves in Month 3 but its waste savings continue in Month 4', () => {
+    const a = projectThroughMonth4(prior('R17'), 'R17', 'A')!;
+    const c = projectThroughMonth4(prior('R17'), 'R17', 'C')!;
+    // Month 3: $180 fee vs 968 × $0.15 saved (−$34.80); Month 4: 1,100 × $0.15 saved: +$130.20 in all.
+    expect(a.operatingIncome - c.operatingIncome).toBe(-18_000 + 968 * 15 + 1100 * 15);
+  });
+  it('is not defined after the Month 4 close', () => {
+    expect(projectThroughMonth4(prior('R24'), 'R24', 'A')).toBeNull();
+  });
+});

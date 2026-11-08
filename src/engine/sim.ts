@@ -423,6 +423,35 @@ export function projectOption(input: GameInput, r: RoundId, option: OptionId): P
   return { ...base, calc: close.calc, operatingIncome: is.operatingIncome, netIncome: is.netIncome, cashAtClose: close.cashAfter };
 }
 
+export interface HorizonProjection {
+  option: OptionId;
+  /** First month the option can affect (its round's month). */
+  from: Month;
+  /** Sum of operating income from `from` through Month 4. */
+  operatingIncome: Cents;
+  cashAtMonth4: Cents;
+}
+
+/**
+ * PRO FORMA through the Month 4 close: this option, then every later round through R23 at its "no new action"
+ * option. Shows decisions that pay back after the current month (R15B, R17, R22B, R23A) on a fair footing.
+ * Later scenario events (weather, waste) are the same for every option, so the comparison stays fair.
+ */
+export function projectThroughMonth4(input: GameInput, r: RoundId, option: OptionId): HorizonProjection | null {
+  const from = targetMonth(r);
+  if (!from) return null;
+  const idx = ROUND_IDS.indexOf(r);
+  const choices: Choices = {};
+  ROUND_IDS.slice(0, idx).forEach((x) => { choices[x] = input.choices[x]; });
+  choices[r] = option;
+  for (let j = idx + 1; j <= ROUND_IDS.indexOf('R23'); j++) choices[ROUND_IDS[j]] = NEUTRAL[ROUND_IDS[j]];
+  const g = runGame({ ...input, choices }, { projection: true });
+  const close4 = g.closes.find((c) => c.month === 4);
+  if (!close4) throw new Error('The Month 4 projection did not close');
+  const operatingIncome = incomeStatement(g.journal.filter((e) => e.period >= from && e.period <= 4)).operatingIncome;
+  return { option, from, operatingIncome, cashAtMonth4: close4.cashAfter };
+}
+
 // ---------------------------------------------------------------- Month 3 budget vs actual
 
 export interface VarianceRow { id: CohortId; label: string; budgetUnits: number; actualUnits: number; budgetUnitCM: Cents; volumeVariance: Cents }

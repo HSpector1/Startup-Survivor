@@ -60,3 +60,11 @@ test('landing states the learning objectives up front', async ({ page }) => {
   await expect(page.getByText(/Interpret financial statements/i).first()).toBeVisible();
   await expect(page.getByText(/no login/i).first()).toBeVisible();
 });
+
+test('dark mode keeps the top bar dark under its light text', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.goto('./');
+  const bg = await page.locator('.topbar').evaluate((e) => getComputedStyle(e).backgroundColor);
+  const [r, g, b] = bg.match(/\d+/g)!.map(Number);
+  expect(0.2126 * r + 0.7152 * g + 0.0722 * b).toBeLessThan(60); // dark background behind #f5f6f2 text
+});
