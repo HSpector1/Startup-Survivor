@@ -378,7 +378,7 @@ export function Till({ save, game, score, onOpenBooks }: { save: Save; game: Gam
   const pro = useMemo(() => {
     if (!current || targetMonth(current) === 0 || roundNumber(current) <= 3) return null;
     try { return projectOption(gameInput(save), current, NEUTRAL[current]); } catch { return null; }
-  }, [current, save.choices]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [current, save.choices, save.mastery]); // eslint-disable-line react-hooks/exhaustive-deps -- mastery feeds the execution factor (A24)
   const decided = Object.keys(save.choices).length;
   const where = current ? periodLabel(roundPeriod(current)) : v.kind === 'close' ? `Month ${v.month} close` : v.kind === 'final' ? 'Start of Month 5' : `Chapter ${v.kind === 'checkpoint' ? v.chapter : chapterOf(ROUND_IDS[Math.max(0, decided - 1)])}`;
 
