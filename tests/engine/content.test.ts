@@ -95,6 +95,10 @@ describe('grading', () => {
     expect(grade(spec('R16'), { value: -924, label: 'U' }).correct).toBe(true);
     expect(grade(spec('R16'), { value: 924, label: 'F' }).correct).toBe(false);
     expect(grade(spec('R16'), { value: 924 }).message).toMatch(/direction/);
+    // A right amount with no direction is incomplete, not wrong: the UI must not count it as an attempt.
+    expect(grade(spec('R16'), { value: 924 }).incomplete).toBe(true);
+    expect(grade(spec('R16'), { value: 924, label: 'F' }).incomplete).toBeUndefined();
+    expect(grade(spec('R16'), { value: 1584 }).incomplete).toBeUndefined();
     expect(grade(spec('R16'), { value: 1584, label: 'U' }).message).toMatch(/revenue-based/);
     expect(grade(spec('R17'), { value: 567, label: 'U' }).correct).toBe(true);
     expect(grade(spec('R19'), { value: 150, label: 'U' }).correct).toBe(true);

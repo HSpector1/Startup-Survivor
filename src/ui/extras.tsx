@@ -212,8 +212,8 @@ function Check({ id, prompt, format, unit, formula, worked, spec, fallback, reco
     const value = Number(raw.replace(/[$,\s]/g, '').replace(/[−–]/g, '-'));
     if (!Number.isFinite(value)) { setMsg('Enter a plain number, such as 843 or -50.'); return; }
     const res = grade(spec, { value, label });
-    const next = { ...record, attempts: record.attempts + 1, correct: res.correct };
-    onRecord(next);
+    // A right amount with no F/U picked is a prompt to finish the answer, not a failed attempt.
+    if (!res.incomplete) onRecord({ ...record, attempts: record.attempts + 1, correct: res.correct });
     setMsg(res.correct ? undefined : res.message ?? fallback ?? 'Not quite. Check each step of the formula.');
   }
 

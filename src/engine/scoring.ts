@@ -3,7 +3,8 @@ import type { Mistake } from '../content/rounds';
 
 export interface CheckSpec { answer: number; tolerance: number; variance?: 'F' | 'U'; mistakes?: Mistake[] }
 export interface Attempt { value: number; label?: 'F' | 'U' }
-export interface GradeResult { correct: boolean; message?: string }
+/** `incomplete`: the amount is right but the F/U direction is missing. Not an attempt; the UI must not count it. */
+export interface GradeResult { correct: boolean; message?: string; incomplete?: true }
 
 const near = (a: number, b: number, tol: number) => Math.abs(a - b) <= tol + 1e-9;
 
@@ -16,7 +17,7 @@ export function grade(spec: CheckSpec, a: Attempt): GradeResult {
       const m = spec.mistakes?.find((x) => near(Math.abs(a.value), Math.abs(x.value), spec.tolerance));
       return { correct: false, message: m?.message };
     }
-    if (!a.label) return { correct: false, message: 'The amount is right. Now mark the direction: favorable (F) or unfavorable (U)?' };
+    if (!a.label) return { correct: false, incomplete: true, message: 'The amount is right. Now mark the direction: favorable (F) or unfavorable (U)?' };
     if (a.label !== spec.variance) return { correct: false, message: `The amount is right but the direction is not. Ask: did this push income ${spec.variance === 'U' ? 'below' : 'above'} the benchmark?` };
     return { correct: true };
   }

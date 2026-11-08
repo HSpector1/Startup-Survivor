@@ -94,8 +94,8 @@ function KnowledgeCheck({ round, record, onRecord, affects }: { round: RoundId; 
     const n = Number(value.replace(/[$,\s]/g, ''));
     if (value.trim() === '' || !Number.isFinite(n)) { setMsg({ ok: false, text: 'Enter a number, for example 1250 or 6.63.' }); return; }
     const g = grade({ answer: mc.answer, tolerance: mc.tolerance ?? 0, variance: ov.variance, mistakes: ov.mistakes }, { value: n, label });
-    const next = { ...record, attempts: record.attempts + 1, correct: g.correct };
-    onRecord(next);
+    // A right amount with no F/U picked is a prompt to finish the answer, not a failed attempt.
+    if (!g.incomplete) onRecord({ ...record, attempts: record.attempts + 1, correct: g.correct });
     setMsg({ ok: g.correct, text: g.message });
   }
 
