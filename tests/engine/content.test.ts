@@ -120,3 +120,18 @@ describe('money helpers', () => {
     expect(roundHalfUp(-0.5)).toBe(-1);
   });
 });
+
+describe('wrong-answer diagnostics name the mistake that produces the value', () => {
+  const has = (id: string, v: number) => expect(OVERLAY[id as keyof typeof OVERLAY].mistakes!.some((m) => Math.abs(m.value - v) < 1)).toBe(true);
+  it('recomputes each diagnosed value from its stated mistake', () => {
+    has('R08', 200 * 7);                                   // $7 margin on new orders, no give-back
+    has('R09', 120 * 2);                                   // overtime cost alone
+    has('R10', 140 * (11 - 5) - 180);                      // $5 instead of $6 per catered bowl
+    has('R12', 180 / 0.5); has('R12', (90 + 180) / 0.5);   // mixer alone; mixer fully expensed
+    has('R15', 1100 * 12 - 5900); has('R15', 1100 * 7 - 5700); // skipped variable costs; left out depreciation
+    has('R23', -2400 + 3 * 1050 + 300);                    // undiscounted
+    has('R23', Math.round(npv(0.1, 2400, [1350, 1350, 1350]))); // resale every year, discounted
+    has('R24', Math.round(npv(0.12, 18000, [6500, 6500, 6500, 6500], 3000) + 18000 - 10800)); // loan as investment
+    has('R24', Math.round(npv(0.12, 18000, [6500, 6500, 6500, 6500], 3000) + 18000 - 7200));  // down payment as investment
+  });
+});

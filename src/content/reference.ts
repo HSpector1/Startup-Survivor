@@ -30,7 +30,7 @@ export const GLOSSARY: {
     definition:
       "Owner's equity is the part of the business's assets that belongs to you after all liabilities are paid. It grows with your contributions and profits and shrinks with losses and owner distributions.",
     formula:
-      "Equity = Contributed capital + Cumulative retained earnings - Owner distributions",
+      "Equity = Contributed capital + Cumulative net income - Owner distributions",
     example:
       "You start with $25,000 of contributed capital. A $1,000 owner distribution later lowers equity by $1,000.",
     rounds: ["R01", "R25"],
@@ -90,13 +90,13 @@ export const GLOSSARY: {
     definition:
       "A prepaid expense is a cost you pay before you use it. It is an asset until you use it up, and then it becomes an expense.",
     example:
-      "You pay $1,000 in Month 4 for next month's advertising. Prepaid Advertising rises by $1,000 and expense is recorded in the month the campaign runs.",
+      "At the start of Month 5 you prepay $1,000 for advertising that runs later. Prepaid Advertising rises by $1,000, and the expense is recorded when the campaign runs.",
     rounds: ["R25"],
   },
   {
     term: "Refundable deposit",
     definition:
-      "A refundable deposit is cash you hand over that you expect to get back. It is an asset, not an expense, because it does not reduce profit.",
+      "A refundable deposit is cash you hand over that you expect to get back. It is an asset, not an expense, because you expect to get the cash back: a future benefit you control.",
     example:
       "Every location requires an $800 deposit. Cash falls by $800, Deposits rise by $800, and profit is unchanged.",
     rounds: ["R02", "R25"],
@@ -405,7 +405,7 @@ export const ASSUMPTIONS: { area: string; rule: string }[] = [
   },
   {
     area: "Asset lives",
-    rule: "The first truck depreciates over 60 months with $0 salvage. The mixer uses 60 months, the upgraded refrigerator 36 months with $0 salvage, and the second truck 48 months with $3,000 salvage.",
+    rule: "The first truck depreciates over 60 months with $0 salvage. The mixer uses 60 months, the upgraded refrigerator 36 months with $0 salvage, the prep machine 36 months with $300 salvage ($58.33 a month), and the second truck 48 months with $3,000 salvage.",
   },
   {
     area: "Deposits",

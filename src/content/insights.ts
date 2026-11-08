@@ -138,7 +138,7 @@ export function insightFor(r: RoundId, input: GameInput, game: GameState): Insig
       ];
       if (r === 'R16' || r === 'R19') rows.push({ label: 'Net sales volume variance', value: varianceText(v.netSalesVolumeVariance) });
       if (r === 'R17') rows.push({ label: `Waste surcharge at ${money(calc.waste)} per meal`, value: `${money(calc.waste * calc.fulfilled)} U`, note: 'Shows up as a materials quantity variance' });
-      if (r === 'R18') rows.push({ label: 'Standard payroll already in your budget', value: money(360_000), note: 'Only the excess and any intervention fee are new costs' });
+      if (r === 'R18') rows.push({ label: 'Standard crew payroll (reference shift)', value: money(360_000), note: 'Already in your monthly budget. Only the excess and any intervention fee are new costs' });
       if (r === 'R19') rows.push(
         { label: 'Static budget operating income', value: money(v.staticIncome) },
         { label: 'Flexible budget at actual volume', value: money(v.flexibleIncome) },

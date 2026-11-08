@@ -557,9 +557,10 @@ export function FinalReport({ game, save, score, onRestart, onBonus }: { game: G
   const credit = r21line('salesDiscounts') ? `You gave a ${fmt(r21line('salesDiscounts')!.dr)} early-payment discount on the corporate order to collect the cash at once.`
     : r21line('factoringFee') ? `You factored the corporate invoice, paying a ${fmt(r21line('factoringFee')!.dr)} fee to turn the receivable into cash.`
     : bsFinal.accountsReceivable > 0 ? `You sold the corporate order on credit, so ${fmt(bsFinal.accountsReceivable)} of earned revenue sits in accounts receivable, not cash.` : undefined;
-  const financing = !truck ? `You kept one truck, ${fmt(bsFinal.cash)} of cash and no bank debt. A conservative path like this can be a sound decision when demand and cash are uncertain.`
+  const debt = bsFinal.totalLiabilities === 0 ? 'no debt' : `${fmt(bsFinal.totalLiabilities)} of debt`;
+  const financing = !truck ? `You kept one truck, ${fmt(bsFinal.cash)} of cash and ${debt}. A conservative path like this can be a sound decision when demand and cash are uncertain.`
     : financed ? `You financed the second truck with a ${fmt(SECOND_TRUCK.loan)} bank loan, which starts ${fmt(TRUCK_PAYMENT)} monthly payments in Month 5. A conservative path, such as waiting, can also be a sound decision.`
-    : `You paid cash for the second truck, leaving ${fmt(bsFinal.cash)} of cash and no bank debt. A conservative path, such as waiting, can also be a sound decision.`;
+    : `You paid cash for the second truck, leaving ${fmt(bsFinal.cash)} of cash and ${debt}. A conservative path, such as waiting, can also be a sound decision.`;
   // Three items, at most four sentences: strongest month, then the most telling of capacity or credit, then financing.
   const shown = best ? [
     `Month ${best.m} was your strongest month, with ${fmt(best.is.operatingIncome)} of operating income.`,
