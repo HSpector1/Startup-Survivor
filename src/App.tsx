@@ -118,7 +118,7 @@ export default function App() {
         )}
         {screen === 'setup' && <Setup hasSave={!!save} onStart={start} onBack={() => setScreen('landing')}
           onImported={(s) => { setSave(s); setLoadError(undefined); setScreen('play'); }} />}
-        {screen === 'quick' && <QuickChallenge onExit={() => setScreen('landing')} />}
+        {screen === 'quick' && <QuickChallenge onExit={() => setScreen('landing')} onCareer={() => setScreen(save ? 'play' : 'setup')} />}
         {screen === 'bonus' && <BonusLab onExit={() => setScreen('landing')} />}
         {screen === 'glossary' && <GlossaryPage onExit={() => setScreen('landing')} />}
         {screen === 'sources' && <SourcesPage onExit={() => setScreen('landing')} />}
