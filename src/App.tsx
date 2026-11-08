@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { CLOSE_AFTER, ROUND_IDS, type Month, type OptionId, type RoundId } from './engine/model';
 import { runGame, type Rescue } from './engine/sim';
 import { EMPTY_RECORD, points, type MasteryRecord } from './engine/scoring';
-import { chapterOf, loadSave, newSave, nextRound, storeSave, type Save, type View } from './state';
+import { chapterOf, gameInput, loadSave, newSave, nextRound, storeSave, type Save, type View } from './state';
 import { ReportsDialog, MonthCloseView, FinalReport } from './ui/reports';
 import { Landing, Setup, QuickChallenge, BonusLab, GlossaryPage, SourcesPage } from './ui/extras';
 import { RoundView, ConsequenceView, CheckpointView, Till } from './ui/play';
@@ -21,12 +21,12 @@ export default function App() {
 
   useEffect(() => { setStoreError(storeSave(save)); }, [save]);
 
-  const game = useMemo(() => (save ? runGame({ choices: save.choices, rescues: save.rescues }) : null), [save]);
+  const game = useMemo(() => (save ? runGame(gameInput(save)) : null), [save]);
   const score = save ? ROUND_IDS.reduce((s, r) => s + points(save.mastery[r]), 0) : 0;
 
   const go = (view: View) => setSave((s) => (s ? { ...s, view } : s));
 
-  function start(name: string) { setSave(newSave(name)); setLoadError(undefined); setScreen('play'); }
+  function start(name: string, affects: boolean) { setSave(newSave(name, affects)); setLoadError(undefined); setScreen('play'); }
   function restart() { setSave(null); setScreen('setup'); }
 
   function recordMastery(r: RoundId, rec: MasteryRecord) {

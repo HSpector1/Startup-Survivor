@@ -10,7 +10,9 @@ function rng(seed: number) { return () => (seed = (seed * 16807) % 2147483647) /
 /** Play a random legal game the way the UI does: only affordable options, rescue when required. */
 function randomGame(seed: number): { input: GameInput; g: GameState } {
   const rnd = rng(seed);
-  const input: GameInput = { choices: {}, rescues: {} };
+  // Half the seeds also play with 'mastery affects sales' at random month factors (A24).
+  const pick = () => [1, 0.95, 0.9, 0.875, 0.8, 0.75][Math.floor(rnd() * 6)];
+  const input: GameInput = { choices: {}, rescues: {}, execution: seed % 2 ? { 1: pick(), 2: pick(), 3: pick(), 4: pick() } : undefined };
   for (const r of ROUND_IDS) {
     const av = availability(input, r);
     const ok = (['A', 'B', 'C'] as OptionId[]).filter((o) => av[o].ok);
@@ -55,7 +57,7 @@ function assertInvariants(input: GameInput, g: GameState) {
     // Closed months are immutable: replaying only the decisions up to the close reproduces them exactly.
     const upto: Choices = {};
     for (const r of ROUND_IDS.slice(0, ROUND_IDS.indexOf(c.round) + 1)) upto[r] = input.choices[r];
-    const prefix = runGame({ choices: upto, rescues: input.rescues });
+    const prefix = runGame({ choices: upto, rescues: input.rescues, execution: input.execution });
     const sig = (gs: GameState) => JSON.stringify(gs.journal.filter((e) => e.period <= c.month && e.period > 0));
     expect(sig(prefix)).toBe(sig({ ...g, journal: g.journal.filter((e) => e.period <= c.month) }));
   }

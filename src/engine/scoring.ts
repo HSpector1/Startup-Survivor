@@ -37,3 +37,26 @@ export function points(r: MasteryRecord | undefined): number {
 }
 
 export const resolved = (r: MasteryRecord | undefined) => !!r && (r.correct || r.revealed);
+
+/** 'Mastery affects sales' (owner decision, audit A24): 4 points → 100% of demand, 2 → 90%, 0 → 75%. */
+export const EXECUTION_BY_POINTS: Record<number, number> = { 4: 1, 2: 0.9, 0: 0.75 };
+
+/** Which month's demand each round's knowledge check feeds. */
+export const FEEDS_MONTH = (roundNumber: number): 1 | 2 | 3 | 4 | 0 =>
+  roundNumber <= 10 ? 1 : roundNumber <= 15 ? 2 : roundNumber <= 20 ? 3 : roundNumber <= 23 ? 4 : 0;
+
+/**
+ * Average execution factor per month over the knowledge checks resolved so far.
+ * Unresolved checks are left out, so projections assume full marks on checks not yet taken.
+ */
+export function executionFactors(records: Partial<Record<string, MasteryRecord>>): Partial<Record<1 | 2 | 3 | 4, number>> {
+  const acc: Record<number, number[]> = {};
+  for (const [id, rec] of Object.entries(records)) {
+    if (!resolved(rec)) continue;
+    const m = FEEDS_MONTH(Number(id.slice(1)));
+    if (m) (acc[m] ??= []).push(EXECUTION_BY_POINTS[points(rec)]);
+  }
+  const out: Partial<Record<1 | 2 | 3 | 4, number>> = {};
+  for (const m of [1, 2, 3, 4] as const) if (acc[m]?.length) out[m] = acc[m].reduce((a, b) => a + b, 0) / acc[m].length;
+  return out;
+}

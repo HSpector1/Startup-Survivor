@@ -48,3 +48,6 @@
 .x-defs dt { font-weight: 700; }
 .x-defs dd { margin: .15rem 0 0; }
 .x-defs dd.formula { display: inline-block; max-width: 100%; overflow-wrap: anywhere; }
+
+.x-check { display: flex; gap: .6rem; align-items: center; cursor: pointer; min-height: 44px; }
+.x-check input { width: 22px; height: 22px; accent-color: var(--saffron-deep); }

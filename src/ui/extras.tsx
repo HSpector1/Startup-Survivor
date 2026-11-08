@@ -110,17 +110,18 @@ export function Landing({ hasSave, resumeLabel, onResume, onNew, onQuick, onBonu
 /* ================================================================ Setup */
 
 export function Setup({ hasSave, onStart, onBack, onImported }: {
-  hasSave: boolean; onStart: (name: string) => void; onBack: () => void; onImported: (s: Save) => void;
+  hasSave: boolean; onStart: (name: string, masteryAffectsSales: boolean) => void; onBack: () => void; onImported: (s: Save) => void;
 }) {
   const h = useFocusHeading('setup');
   const [name, setName] = useState(DEFAULT_NAME);
   const [armed, setArmed] = useState(false);
+  const [affects, setAffects] = useState(true);
   const [importError, setImportError] = useState<string>();
 
   function submit(e: FormEvent) {
     e.preventDefault();
     if (hasSave && !armed) { setArmed(true); return; }
-    onStart(name);
+    onStart(name, affects);
   }
 
   async function onFile(e: ChangeEvent<HTMLInputElement>) {
@@ -150,6 +151,17 @@ export function Setup({ hasSave, onStart, onBack, onImported }: {
           </div>
           <p className="small">This is equity, not revenue: the business has more cash because you own more of it, not because it earned anything.</p>
           <p className="small">Chapter 1 asks you to buy a truck, pick a location, set a bowl price and find your break-even point. Your first month of sales closes in Chapter 2.</p>
+        </div>
+        <div className="panel">
+          <label className="x-check">
+            <input type="checkbox" checked={affects} onChange={(e) => setAffects(e.target.checked)} aria-describedby="affects-help" />
+            <span><strong>Mastery affects sales</strong></span>
+          </label>
+          <p id="affects-help" className="small" style={{ margin: '.4rem 0 0' }}>
+            A business runs as well as its owner understands the numbers. Each month, customer demand is scaled by your knowledge-check results for that month:
+            4 of 4 points gives 100% of normal demand, 2 points 90%, and 0 points 75%. Contract sales (catering, the corporate order) are not affected.
+            Sales still post normally, so the books stay exact. Turn this off to play with the pure spec numbers.
+          </p>
         </div>
         {hasSave && armed && (
           <div className="banner warn" role="alert">Starting a new company replaces your saved game. Export a backup first if you want to keep it.</div>

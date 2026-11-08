@@ -3,10 +3,10 @@ import { CLOSE_AFTER, NEUTRAL, ROUND_IDS, roundPeriod, type OptionId, type Round
 import { availability, projectOption, periodLabel, targetMonth, type GameState, type Projection } from '../engine/sim';
 import { balanceSheet, incomeStatement } from '../engine/ledger';
 import { fmt } from '../engine/money';
-import { grade, points, resolved, type MasteryRecord } from '../engine/scoring';
+import { EXECUTION_BY_POINTS, FEEDS_MONTH, executionFactors, grade, points, resolved, type MasteryRecord } from '../engine/scoring';
 import { CHAPTERS, CHAPTER_BLURB, OVERLAY, modulesOf, promptOf, roundById, workedOf } from '../content/rounds';
 import { effectSummary, insightFor } from '../content/insights';
-import { exportSave, chapterOf, type Save } from '../state';
+import { exportSave, chapterOf, gameInput, type Save } from '../state';
 import { ChapterIcon, TruckIcon } from './art';
 import { Delta, JournalView, Money, useFocusHeading } from './common';
 
@@ -21,7 +21,7 @@ export function RoundView({ round, save, game, record, onRecord, onDecide }: {
   const spec = roundById(round);
   const ov = OVERLAY[round];
   const head = useFocusHeading(round);
-  const input = { choices: save.choices, rescues: save.rescues };
+  const input = gameInput(save);
   const insight = useMemo(() => insightFor(round, input, game), [round, game]); // eslint-disable-line react-hooks/exhaustive-deps
   const ready = resolved(record);
 
@@ -65,7 +65,7 @@ export function RoundView({ round, save, game, record, onRecord, onDecide }: {
         </section>
       )}
 
-      <KnowledgeCheck round={round} record={record} onRecord={onRecord} />
+      <KnowledgeCheck round={round} record={record} onRecord={onRecord} affects={!!save.masteryAffectsSales} />
 
       <section aria-labelledby="decide" className="stack">
         <div>
@@ -80,7 +80,7 @@ export function RoundView({ round, save, game, record, onRecord, onDecide }: {
   );
 }
 
-function KnowledgeCheck({ round, record, onRecord }: { round: RoundId; record: MasteryRecord; onRecord: (r: MasteryRecord) => void }) {
+function KnowledgeCheck({ round, record, onRecord, affects }: { round: RoundId; record: MasteryRecord; onRecord: (r: MasteryRecord) => void; affects: boolean }) {
   const spec = roundById(round);
   const ov = OVERLAY[round];
   const mc = spec.mastery_check;
@@ -154,6 +154,11 @@ function KnowledgeCheck({ round, record, onRecord }: { round: RoundId; record: M
             <p className="formula" style={{ margin: '.4rem 0' }}>{mc.formula}</p>
             <p style={{ margin: 0 }}>{workedOf(spec)}</p>
             {(!record.correct || record.revealed || record.attempts > 1) && <p className="small muted" style={{ margin: '.5rem 0 0' }}>{mc.feedback_for_wrong_answers}</p>}
+            {affects && FEEDS_MONTH(spec.number) > 0 && (
+              <p className="small" style={{ margin: '.5rem 0 0' }}>
+                <strong>Execution:</strong> {Math.round(EXECUTION_BY_POINTS[pts] * 100)}% for this check. Month {FEEDS_MONTH(spec.number)} customer demand uses the average of its checks (4 points = 100%, 2 = 90%, 0 = 75%).
+              </p>
+            )}
           </div>
         )}
       </div>
@@ -168,7 +173,7 @@ function projectionRows(p: Projection): [string, string][] {
 
 function Decision({ round, save, onDecide }: { round: RoundId; save: Save; onDecide: (o: OptionId) => void }) {
   const spec = roundById(round);
-  const input = { choices: save.choices, rescues: save.rescues };
+  const input = gameInput(save);
   const av = useMemo(() => availability(input, round), [round, save.choices]); // eslint-disable-line react-hooks/exhaustive-deps
   const proj = useMemo(() => OPTS.map((o) => projectOption(input, round, o)), [round, save.choices]); // eslint-disable-line react-hooks/exhaustive-deps
   const [pick, setPick] = useState<OptionId | null>(null);
@@ -217,7 +222,7 @@ export function ConsequenceView({ round, save, game, onContinue }: { round: Roun
   const spec = roundById(round);
   const chosen = save.choices[round]!;
   const head = useFocusHeading(`c-${round}`);
-  const prior = { choices: Object.fromEntries(ROUND_IDS.slice(0, ROUND_IDS.indexOf(round)).map((r) => [r, save.choices[r]])), rescues: save.rescues };
+  const prior = { ...gameInput(save), choices: Object.fromEntries(ROUND_IDS.slice(0, ROUND_IDS.indexOf(round)).map((r) => [r, save.choices[r]])) };
   const proj = useMemo(() => OPTS.map((o) => projectOption(prior, round, o)), [round]); // eslint-disable-line react-hooks/exhaustive-deps
   const mine = proj[OPTS.indexOf(chosen)];
   const immediate = game.journal.filter((e) => e.round === round && !e.id.startsWith('M'));
@@ -372,7 +377,7 @@ export function Till({ save, game, score, onOpenBooks }: { save: Save; game: Gam
   const current = v.kind === 'round' ? v.round : undefined;
   const pro = useMemo(() => {
     if (!current || targetMonth(current) === 0 || roundNumber(current) <= 3) return null;
-    try { return projectOption({ choices: save.choices, rescues: save.rescues }, current, NEUTRAL[current]); } catch { return null; }
+    try { return projectOption(gameInput(save), current, NEUTRAL[current]); } catch { return null; }
   }, [current, save.choices]); // eslint-disable-line react-hooks/exhaustive-deps
   const decided = Object.keys(save.choices).length;
   const where = current ? periodLabel(roundPeriod(current)) : v.kind === 'close' ? `Month ${v.month} close` : v.kind === 'final' ? 'Start of Month 5' : `Chapter ${v.kind === 'checkpoint' ? v.chapter : chapterOf(ROUND_IDS[Math.max(0, decided - 1)])}`;
@@ -402,6 +407,7 @@ export function Till({ save, game, score, onOpenBooks }: { save: Save; game: Gam
       <dl>
         {lastIS ? (<><dt>Month {last.month} sales (actual)</dt><dd>{fmt(lastIS.netSales)}</dd><dt>Month {last.month} operating income</dt><dd className={lastIS.operatingIncome < 0 ? 'bad' : 'ok'}>{fmt(lastIS.operatingIncome)}</dd></>) : <><dt>Months closed</dt><dd>none yet</dd></>}
         {pro?.operatingIncome !== undefined && <><dt>Month {pro.month} so far (pro forma)</dt><dd>{fmt(pro.operatingIncome)}</dd></>}
+        {save.masteryAffectsSales && pro?.month ? <><dt>Month {pro.month} execution</dt><dd>{Math.round((executionFactors(save.mastery)[pro.month as 1] ?? 1) * 1000) / 10}%</dd></> : null}
       </dl>
       <div className={bs.balanced ? 'ok small' : 'bad small'} role={bs.balanced ? undefined : 'alert'}>
         {bs.balanced ? `✓ Books balance: ${fmt(bs.totalAssets)} = ${fmt(bs.totalLiabilities)} + ${fmt(bs.totalEquity)}` : '✗ The books do not balance. Please report this.'}

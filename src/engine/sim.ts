@@ -10,7 +10,12 @@ import { balanceSheet, cr, dr, event, incomeStatement, type JournalEvent, type L
 
 export type Choices = Partial<Record<RoundId, OptionId>>;
 export type Rescue = 'equity' | 'loan';
-export interface GameInput { choices: Choices; rescues?: Partial<Record<Month, Rescue>> }
+export interface GameInput {
+  choices: Choices;
+  rescues?: Partial<Record<Month, Rescue>>;
+  /** Optional 'mastery affects sales' factor per month (1 = normal demand). See audit A24. */
+  execution?: Partial<Record<Month, number>>;
+}
 export interface Tagged { round: RoundId; effect: Effect }
 
 export function collectEffects(choices: Choices, uptoIndex = 24): Tagged[] {
@@ -63,7 +68,7 @@ export interface MonthCalc {
   demandNotes: string[];
 }
 
-export interface CalcOptions { weather?: boolean; waste?: boolean }
+export interface CalcOptions { weather?: boolean; waste?: boolean; execution?: number }
 
 function wasteRate(tags: Tagged[], m: Month, enabled: boolean): Cents {
   if (!enabled || m < BASE_WASTE.from) return 0;
@@ -79,6 +84,9 @@ export function monthlyDepreciation(cost: Cents, salvage: Cents, life: number, k
 
 export function computeMonth(m: Month, tags: Tagged[], opts: CalcOptions = {}): MonthCalc {
   const weatherOn = opts.weather ?? true;
+  // Execution factor from knowledge checks: scales customer demand, never contracts (catering, R21).
+  const X = opts.execution ?? 1;
+  if (!(X > 0 && X <= 1)) throw new Error(`Execution factor must be in (0, 1], got ${X}`);
   const active = <T extends { span: { from: Month; to: Month } }>(xs: { e: T }[]) => xs.filter((x) => inSpan(x.e.span, m)).map((x) => x.e);
 
   const priceSet = pick(tags, 'bowlPrice');
@@ -119,7 +127,8 @@ export function computeMonth(m: Month, tags: Tagged[], opts: CalcOptions = {}): 
   if (discontinued) notes.push('Wraps discontinued: wrap demand is lost; bowl demand is unchanged');
   const bowlsExact = Math.max(0, (P * (1 - w) + bowlOnly - C) * E * W) + promoPool * (1 - w) + promoBowl;
   const wrapsExact = discontinued ? 0 : P * w * wf * E * W + promoPool * w + promoWrap;
-  const regularTotal = roundHalfUp(bowlsExact + wrapsExact);
+  if (X !== 1) notes.push(`Execution from your knowledge checks: ×${+X.toFixed(4)} on customer demand`);
+  const regularTotal = roundHalfUp((bowlsExact + wrapsExact) * X);
   const [bowlDemand, wrapDemand] = largestRemainder(regularTotal, [bowlsExact, wrapsExact]);
 
   // Prices
@@ -147,9 +156,9 @@ export function computeMonth(m: Month, tags: Tagged[], opts: CalcOptions = {}): 
   pick(tags, 'catering').filter((x) => x.e.month === m).forEach(({ e }) => wanted.push({ id: 'catering', item: 'bowl', demand: e.units, price: e.price, extra: e.extraCost, rate: 0 }));
   wanted.push({ id: 'bowl', item: 'bowl', demand: bowlDemand, price: bowlList - discount, extra: 0, rate: 0 });
   wanted.push({ id: 'wrap', item: 'wrap', demand: wrapDemand, price: wrapList - discount, extra: 0, rate: 0 });
-  if (prem.length && premiumList !== null) wanted.push({ id: 'premium', item: 'premium', demand: roundHalfUp(prem[0].units * Eprem * W), price: premiumList, extra: 0, rate: 0 });
+  if (prem.length && premiumList !== null) wanted.push({ id: 'premium', item: 'premium', demand: roundHalfUp(prem[0].units * Eprem * W * X), price: premiumList, extra: 0, rate: 0 });
   for (const ch of active(pick(tags, 'channel'))) {
-    const units = ch.channel === 'coupon' ? ch.units : roundHalfUp(ch.units * E);
+    const units = roundHalfUp((ch.channel === 'coupon' ? ch.units : ch.units * E) * X);
     wanted.push({ id: ch.channel, item: 'bowl', demand: units, price: bowlList + (ch.priceDelta ?? 0), extra: 0, rate: ch.commissionRate ?? 0 });
   }
 
@@ -335,7 +344,7 @@ export function runGame(input: GameInput, opts: { projection?: boolean } = {}): 
         const interest = pct(bridge, BRIDGE_RATE_MONTHLY);
         post(event(`M${m}-interest`, r, m, 'Bridge loan interest (1.5% per month)', [dr('interest', interest, 'Bridge loan interest', { cls: 'nonOperating' }), cr('cash', interest, 'Paid bridge loan interest', { cf: 'operating' })]));
       }
-      const calc = computeMonth(m, collectEffects(input.choices, i));
+      const calc = computeMonth(m, collectEffects(input.choices, i), { execution: input.execution?.[m] });
       monthEvents(calc, r).forEach(post);
       const close: ClosedMonth = { month: m, round: r, calc, cashAfter: cashOf(journal) };
       st.closes.push(close);
@@ -367,7 +376,7 @@ export function availability(input: GameInput, r: RoundId): Record<OptionId, { o
   const idx = ROUND_IDS.indexOf(r);
   const prior: Choices = {};
   ROUND_IDS.slice(0, idx).forEach((x) => { if (input.choices[x]) prior[x] = input.choices[x]; });
-  const cash = cashOf(runGame({ choices: prior, rescues: input.rescues }).journal);
+  const cash = cashOf(runGame({ ...input, choices: prior }).journal);
   const out = {} as Record<OptionId, { ok: boolean; reason?: string }>;
   for (const o of ['A', 'B', 'C'] as OptionId[]) {
     const guard = EFFECTS[r][o].find((e) => e.kind === 'minCash') as Extract<Effect, { kind: 'minCash' }> | undefined;
@@ -401,14 +410,14 @@ export function projectOption(input: GameInput, r: RoundId, option: OptionId): P
   const choices: Choices = {};
   ROUND_IDS.slice(0, idx).forEach((x) => { choices[x] = input.choices[x]; });
   choices[r] = option;
-  const now = runGame({ choices, rescues: input.rescues }, { projection: true });
+  const now = runGame({ ...input, choices }, { projection: true });
   const bsNow = balanceSheet(now.journal);
   const m = targetMonth(r);
   const base = { option, month: m, cashNow: bsNow.cash, equityNow: bsNow.totalEquity, liabilitiesNow: bsNow.totalLiabilities };
   if (!m) return base;
   const closeRound = (Object.keys(CLOSE_AFTER) as RoundId[]).find((k) => CLOSE_AFTER[k] === m)!;
   for (let j = idx + 1; j <= ROUND_IDS.indexOf(closeRound); j++) choices[ROUND_IDS[j]] = NEUTRAL[ROUND_IDS[j]];
-  const full = runGame({ choices, rescues: input.rescues }, { projection: true });
+  const full = runGame({ ...input, choices }, { projection: true });
   const close = full.closes.find((c) => c.month === m)!;
   const is = incomeStatement(full.journal.filter((e) => e.period === m));
   return { ...base, calc: close.calc, operatingIncome: is.operatingIncome, netIncome: is.netIncome, cashAtClose: close.cashAfter };

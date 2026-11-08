@@ -1,7 +1,7 @@
 // Save, resume, export and import. The save holds decisions only; the ledger is replayed (audit E1).
 import { ROUND_IDS, type Month, type OptionId, type RoundId } from './engine/model';
 import { runGame, type GameInput, type Rescue } from './engine/sim';
-import type { MasteryRecord } from './engine/scoring';
+import { executionFactors, type MasteryRecord } from './engine/scoring';
 
 export const SAVE_KEY = 'startup-survivor:v1';
 export const SCHEMA_VERSION = 1;
@@ -22,16 +22,18 @@ export interface Save {
   rescues: Partial<Record<Month, Rescue>>;
   mastery: Partial<Record<RoundId, MasteryRecord>>;
   view: View;
+  /** Knowledge-check mastery scales customer demand (audit A24). Saves made before this setting existed read as off. */
+  masteryAffectsSales?: boolean;
   /** State at the start of each chapter, for "restart this chapter". */
   checkpoints: Partial<Record<number, Snapshot>>;
 }
 
 export const DEFAULT_NAME = 'Golden Hour Bowls';
 
-export function newSave(truckName: string): Save {
+export function newSave(truckName: string, masteryAffectsSales = true): Save {
   const name = truckName.trim().slice(0, 28) || DEFAULT_NAME;
   return {
-    schemaVersion: 1, truckName: name, choices: {}, rescues: {}, mastery: {},
+    schemaVersion: 1, truckName: name, choices: {}, rescues: {}, mastery: {}, masteryAffectsSales,
     view: { kind: 'round', round: 'R01' },
     checkpoints: { 1: { choices: {}, rescues: {}, mastery: {} } },
   };
@@ -48,7 +50,7 @@ export function validateSave(x: unknown): Save {
     if (!['A', 'B', 'C'].includes(String(s.choices[k as RoundId]))) throw new Error(`Round ${k} has an unknown option.`);
   }
   if (!s.view || !['round', 'consequence', 'close', 'checkpoint', 'final'].includes(s.view.kind)) throw new Error('The save has no valid screen position.');
-  runGame({ choices: s.choices, rescues: s.rescues ?? {} }); // throws ChoiceError on an impossible decision path
+  runGame(gameInput({ ...s, rescues: s.rescues ?? {}, mastery: s.mastery ?? {} })); // throws ChoiceError on an impossible decision path
   return { ...s, rescues: s.rescues ?? {}, mastery: s.mastery ?? {}, checkpoints: s.checkpoints ?? {} };
 }
 
@@ -90,6 +92,11 @@ export async function importSave(file: File): Promise<Save> {
   let obj: unknown;
   try { obj = JSON.parse(text); } catch { throw new Error('That file is not a Startup Survivor save (it is not valid JSON).'); }
   return validateSave(obj);
+}
+
+/** The engine input for a save: decisions, rescues and (if the setting is on) the execution factors. */
+export function gameInput(s: Pick<Save, 'choices' | 'rescues' | 'mastery' | 'masteryAffectsSales'>): GameInput {
+  return { choices: s.choices, rescues: s.rescues, execution: s.masteryAffectsSales ? executionFactors(s.mastery) : undefined };
 }
 
 export const chapterOf = (r: RoundId) => Math.floor((Number(r.slice(1)) - 1) / 5) + 1;

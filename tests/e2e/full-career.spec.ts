@@ -128,3 +128,28 @@ test('calculator works out an answer and fills the answer box', async ({ page })
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+test('mastery affects sales: a revealed answer lowers that month\'s demand, and the switch turns it off', async ({ page }) => {
+  await page.goto('./'); await page.evaluate(() => localStorage.clear()); await page.goto('./');
+  await page.getByRole('button', { name: 'Start a full career' }).click();
+  await expect(page.getByLabel('Mastery affects sales')).toBeChecked();
+  await page.getByLabel('Name your truck').fill('Shaky Books');
+  await page.getByRole('button', { name: 'Start Chapter 1' }).click();
+  // R01: miss, then reveal → 0 points → 75% for this check.
+  await page.getByLabel(/Your answer/).fill('12000');
+  await page.getByRole('button', { name: 'Check answer' }).click();
+  await page.getByRole('button', { name: 'Reveal the answer' }).click();
+  await expect(page.getByText(/Execution:.*75% for this check/)).toBeVisible();
+  // Rest of Month 1 aced; Month 1 execution = (0.75 + 9 × 1) / 10 = 97.5%.
+  for (let i = 0; i < 10; i++) {
+    if (i > 0) await answer(page, ROUNDS[i].id, ROUNDS[i].mastery_check.answer);
+    await page.locator('.ticket').nth('ABC'.indexOf(REFERENCE[i])).click();
+    await page.getByRole('button', { name: `Confirm option ${REFERENCE[i]}` }).click();
+    const next = i === 9 ? 'Close Month 1' : i === 4 ? 'Finish Chapter 1' : 'Next round';
+    await page.getByRole('button', { name: next }).click();
+    if (i === 4) await page.getByRole('button', { name: /Start Chapter 2/ }).click();
+  }
+  // 1,100 × 0.975 = 1,072.5 → 1,073 regular orders: 966 bowls + 107 wraps.
+  await expect(page.getByText(/Execution from your knowledge checks: ×0\.975/)).toBeAttached();
+  await expect(page.locator('.till')).toContainText('$12,662.00'); // Month 1 sales: 966 × $12 + 107 × $10 = $11,592 + $1,070
+});

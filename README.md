@@ -20,6 +20,10 @@ An accounting simulation for Auburn University BUSI 7230, Cost Analysis and Syst
 
 The game also includes a calculator (top bar, every screen: parentheses, powers for NPV, percent, and "Use in answer"), a glossary of 41 terms and a Sources & Assumptions page.
 
+## Mastery affects sales
+
+On by default (switch at setup). Your knowledge-check results set how well each month runs: every check scored 4 of 4 gives 100% of normal customer demand, 2 points gives 90%, and a revealed answer (0 points) gives 75%. Each month uses the average of its checks. Contract sales are not affected, and every sale still posts normally, so the books stay exact. Audit rule A24 has the details.
+
 ## How it works
 
 - **Engine** (`src/engine/`): pure TypeScript functions. Money is integer cents. Each of the 75 options is a typed list of effects (`model.ts`). The simulation (`sim.ts`) replays the decisions into a double-entry journal (`ledger.ts`) and closes Month 1 after R10, Month 2 after R15, Month 3 after R20 and Month 4 after R23. R24 and R25 post at the start of Month 5.

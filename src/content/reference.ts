@@ -460,6 +460,10 @@ export const ASSUMPTIONS: { area: string; rule: string }[] = [
     rule: "All prices, demand levels, costs, rates and hurdle rates are made-up teaching values. They are not market data and promise no real return.",
   },
   {
+    area: "Mastery affects sales",
+    rule: "On by default and switchable at setup. Each month, customer demand is multiplied by the average of that month's knowledge-check results: 4 points = 100%, 2 points = 90%, 0 points = 75%. Catering contracts and the corporate order are not affected. Only fewer customers arrive; every sale that happens still posts normally, so the books balance exactly.",
+  },
+  {
     area: "Saving",
     rule: "The game needs no login and collects no personal data. It saves your progress in your own browser.",
   },
