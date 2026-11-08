@@ -141,8 +141,12 @@ test('mastery affects sales: a revealed answer lowers that month\'s demand, and 
   await page.getByRole('button', { name: 'Reveal the answer' }).click();
   await expect(page.getByText(/Execution:.*75% for this check/)).toBeVisible();
   // Rest of Month 1 aced; Month 1 execution = (0.75 + 9 × 1) / 10 = 97.5%.
+  const proForma = page.locator('.till dt', { hasText: 'Month 1 so far (pro forma)' }).locator('xpath=following-sibling::dd[1]');
   for (let i = 0; i < 10; i++) {
+    // The dashboard's pro forma must follow the execution factor as soon as a check is answered, not only after a decision.
+    const before = i === 3 ? await proForma.textContent() : null; // R04: (0.75 + 1 + 1) / 3 = 91.67% so far
     if (i > 0) await answer(page, ROUNDS[i].id, ROUNDS[i].mastery_check.answer);
+    if (i === 3) await expect(proForma).not.toHaveText(before!); // now (0.75 + 3) / 4 = 93.75%
     await page.locator('.ticket').nth('ABC'.indexOf(REFERENCE[i])).click();
     await page.getByRole('button', { name: `Confirm option ${REFERENCE[i]}` }).click();
     const next = i === 9 ? 'Close Month 1' : i === 4 ? 'Finish Chapter 1' : 'Next round';
