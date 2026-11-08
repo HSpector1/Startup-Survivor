@@ -12,9 +12,9 @@ const QUICK = [
 test('Quick Challenge: five problems, feedback, decisions and a 20-point score', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto('/');
+  await page.goto('./');
   await page.evaluate(() => localStorage.clear());
-  await page.goto('/');
+  await page.goto('./');
   await page.getByRole('button', { name: /Quick Challenge/ }).first().click();
   await page.getByRole('button', { name: 'Start problem 1' }).click();
 
@@ -42,7 +42,7 @@ test('Quick Challenge: five problems, feedback, decisions and a 20-point score',
 });
 
 test('landing states the learning objectives up front', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./');
   await expect(page.getByText(/Interpret financial statements/i).first()).toBeVisible();
   await expect(page.getByText(/no login/i).first()).toBeVisible();
 });

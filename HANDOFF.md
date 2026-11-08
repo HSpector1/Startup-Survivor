@@ -9,8 +9,10 @@ Last writer: Claude (Opus 5.5), 2026-11-08
 ## State (verified 2026-11-08)
 - Game complete and playable: Full Career (25 rounds, 4 month closes, checkpoints, save/resume/export/import), Quick Challenge (5 rounds), Mastery Lab (B1 to B5), glossary (41 terms), Sources & assumptions, investor report.
 - `python3 -I docs/startup_survivor_validation.py`: PASS, 28 examples and 4 reconciliations.
-- `npx vitest run`: 418 passed. Covers all 75 options against hand-computed values, 300 randomized legal games, the lean, aggressive and constrained-cash paths, and a recomputation of every worked answer.
-- `npx playwright test`: 12 passed (desktop 1440px and mobile 375px): full career through the UI ends at the validator's numbers (cash $6,715.10, equity $28,315.10), reload/resume, keyboard-only round, no horizontal scroll, Quick Challenge with feedback and score.
+- `npx vitest run`: 419 passed. Covers all 75 options against hand-computed values, 300 randomized legal games, the lean, aggressive and constrained-cash paths, a recomputation of every worked answer, and a check that each wrong-answer diagnostic names the mistake that really produces its value.
+- GitHub Actions run the validator, typecheck, Vitest and build on every push, then deploy. Runs for commits f7fe90d and 5b50df2 passed and deployed.
+- A fourth review (adversarial CPA-level read of engine, content and reports) found no posting errors; its 12 content findings are fixed in 5b50df2.
+- `npx playwright test`: 12 passed locally and 12 passed against the live Pages site (`BASE_URL=https://hspector1.github.io/Startup-Survivor/`), desktop 1440px and mobile 375px: full career through the UI ends at the validator's numbers (cash $6,715.10, equity $28,315.10), reload/resume, keyboard-only round, no horizontal scroll, Quick Challenge with feedback and score.
 - Three independent reviews ran: a spec audit with its own Python simulator (matches to the cent), a formula and terminology check against the Easton 7e workbooks, and per-screen self-checks by the UI builders. Their findings are resolved in `docs/IMPLEMENTATION_AUDIT.md` (A1 to A23).
 
 ## Next step

@@ -38,9 +38,9 @@ async function playRound(page: Page, i: number, letter: string) {
 }
 
 async function startCareer(page: Page, name = 'Test Truck') {
-  await page.goto('/');
+  await page.goto('./');
   await page.evaluate(() => localStorage.clear());
-  await page.goto('/');
+  await page.goto('./');
   await page.getByRole('button', { name: 'Start a full career' }).click();
   await page.getByLabel('Name your truck').fill(name);
   await page.getByRole('button', { name: 'Start Chapter 1' }).click();
