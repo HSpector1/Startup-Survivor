@@ -14,6 +14,8 @@ import { useFocusHeading } from './common';
 import { ChapterIcon, TruckHero } from './art';
 
 const OPTION_IDS: OptionId[] = ['A', 'B', 'C'];
+/** "Should you open a second truck?" keeps its question mark; other titles get a full stop. */
+const endStop = (title: string) => (/[.?!]$/.test(title) ? title : `${title}.`);
 
 /* ================================================================ Landing */
 
@@ -299,7 +301,14 @@ function priorChoices(r: RoundId): Choices {
   return out;
 }
 
-interface MetricTable { labels: string[]; values: Record<OptionId, (Cents | null)[]>; note: string }
+type Unit = 'money' | 'orders';
+interface MetricTable { labels: string[]; units: Unit[]; values: Record<OptionId, (number | null)[]>; note: string }
+
+/** Rounds whose options keep paying (or costing) after the current month, so the table shows Month 4 as well. */
+const ALSO_MONTH_4: Partial<Record<RoundId, string>> = {
+  R17: 'Training and the renegotiated price keep saving money after Month 3, so Month 4 is shown too.',
+  R19: 'Cutting marketing and raising prices start in Month 4, so Month 3 is the same for all three.',
+};
 
 /** Projected effect of each option on the reference business. Throws if the engine refuses. */
 function projectQuick(r: RoundId): MetricTable {
@@ -307,32 +316,36 @@ function projectQuick(r: RoundId): MetricTable {
   const p = Object.fromEntries(OPTION_IDS.map((o) => [o, projectOption({ choices: prior }, r, o)])) as Record<OptionId, ReturnType<typeof projectOption>>;
   if (r === 'R24') {
     return {
-      labels: ['Cash right after', 'Liabilities right after', 'Project NPV'],
+      labels: ['Cash right after', 'Liabilities right after', 'Project NPV'], units: ['money', 'money', 'money'],
       values: Object.fromEntries(OPTION_IDS.map((o) => [o, [p[o].cashNow, p[o].liabilitiesNow, o === 'C' ? null : R24_NPV]])) as MetricTable['values'],
       note: 'Start of Month 5, after the Month 4 close. Buying with cash and financing 60% give the same NPV, +$3,649.32: the loan changes cash and debt, not the project.',
     };
   }
   const m = p.A.month;
-  const labels = [`Month ${m} operating income`, `Cash at Month ${m} close`];
-  const values = Object.fromEntries(OPTION_IDS.map((o) => [o, [p[o].operatingIncome ?? null, p[o].cashAtClose ?? null]])) as MetricTable['values'];
+  // Orders turned away is the capacity story: a catering contract or a promotion that the kitchen cannot serve earns nothing.
+  const labels = [`Month ${m} operating income`, `Cash at Month ${m} close`, `Orders turned away in Month ${m}`];
+  const units: Unit[] = ['money', 'money', 'orders'];
+  const values = Object.fromEntries(OPTION_IDS.map((o) => [o, [p[o].operatingIncome ?? null, p[o].cashAtClose ?? null, p[o].calc?.lost ?? null]])) as MetricTable['values'];
   let note = `Pro forma. Later rounds in Month ${m} are held at their "no new action" option.`;
-  if (r === 'R19') {
-    // R19B and R19C start in Month 4, so Month 3 is the same for all three; show Month 4 too.
+  const why = ALSO_MONTH_4[r];
+  if (why && m !== 4) {
     labels.push('Month 4 operating income', 'Cash at Month 4 close');
+    units.push('money', 'money');
     for (const o of OPTION_IDS) {
-      const c: Choices = { ...prior, R19: o };
-      ROUND_IDS.slice(19, 23).forEach((x) => { c[x] = NEUTRAL[x]; });
+      const c: Choices = { ...prior, [r]: o };
+      ROUND_IDS.slice(ROUND_IDS.indexOf(r) + 1, 23).forEach((x) => { c[x] = NEUTRAL[x]; });
       const g = runGame({ choices: c }, { projection: true });
       const close = g.closes.find((x) => x.month === 4);
       if (!close) throw new Error('The Month 4 projection did not close.');
       values[o].push(incomeStatement(g.journal.filter((e) => e.period === 4)).operatingIncome, close.cashAfter);
     }
-    note = 'Pro forma. Cutting marketing and raising prices start in Month 4, so Month 3 is the same for all three. Months 3 and 4 hold later rounds at their "no new action" option.';
+    note = `Pro forma. ${why} Months ${m} and 4 hold later rounds at their "no new action" option.`;
   }
-  return { labels, values, note };
+  return { labels, units, values, note };
 }
 
-const show = (c: Cents | null) => (c === null ? 'n/a' : fmt(c));
+const show = (v: number | null, unit: Unit) => (v === null ? 'n/a' : unit === 'money' ? fmt(v) : v.toLocaleString('en-US'));
+const showDelta = (d: number, unit: Unit) => (unit === 'money' ? fmt(d, { sign: true }) : `${d > 0 ? '+' : ''}${d.toLocaleString('en-US')}`);
 
 function Ticket({ opt, pressed, blocked, onPick, children }: { opt: SpecOption; pressed: boolean; blocked?: string; onPick: () => void; children?: ReactNode }) {
   return (
@@ -388,7 +401,7 @@ function QuickProblem({ r, n, result, onChange, onNext, last }: {
                 <Ticket key={o.id} opt={o} pressed={result.choice === o.id} blocked={blocked} onPick={() => onChange({ ...result, choice: o.id })}>
                   {'table' in proj && proj.table && (
                     <dl>
-                      {proj.table.labels.map((l, i) => (<div key={l} className="x-dl-row"><dt>{l}</dt><dd>{show(proj.table!.values[o.id][i])}</dd></div>))}
+                      {proj.table.labels.map((l, i) => (<div key={l} className="x-dl-row"><dt>{l}</dt><dd>{show(proj.table!.values[o.id][i], proj.table!.units[i])}</dd></div>))}
                     </dl>
                   )}
                 </Ticket>
@@ -430,8 +443,8 @@ function Consequence({ r, choice, table }: { r: RoundId; choice: OptionId; table
                   const d = v !== null && base !== null && o !== choice ? v - base : null;
                   return (
                     <td key={i} className="num">
-                      {show(v)}
-                      {d !== null && <span className="x-delta">{d === 0 ? 'same' : `${fmt(d, { sign: true })} vs yours`}</span>}
+                      {show(v, table.units[i])}
+                      {d !== null && <span className="x-delta">{d === 0 ? 'same' : `${showDelta(d, table.units[i])} vs yours`}</span>}
                     </td>
                   );
                 })}
@@ -447,7 +460,7 @@ function Consequence({ r, choice, table }: { r: RoundId; choice: OptionId; table
   );
 }
 
-export function QuickChallenge({ onExit }: { onExit: () => void }) {
+export function QuickChallenge({ onExit, onCareer }: { onExit: () => void; onCareer: () => void }) {
   const [step, setStep] = useState(-1); // -1 intro, 0..4 problems, 5 summary
   const [results, setResults] = useState<QuickResult[]>(() => QUICK.map(() => ({ record: EMPTY_RECORD })));
   const total = results.reduce((s, x) => s + points(x.record), 0);
@@ -456,7 +469,7 @@ export function QuickChallenge({ onExit }: { onExit: () => void }) {
   if (step >= QUICK.length) {
     return <Summary title="Quick Challenge results" kind="quick" score={total}
       rows={QUICK.map((r, i) => ({ id: r, title: roundById(r).title, record: results[i].record, choice: results[i].choice ? `${results[i].choice}, ${roundById(r).options.find((o) => o.id === results[i].choice)?.label}` : 'none' }))}
-      onExit={onExit} onAgain={() => { setResults(QUICK.map(() => ({ record: EMPTY_RECORD }))); setStep(0); }} />;
+      onExit={onExit} onCareer={onCareer} onAgain={() => { setResults(QUICK.map(() => ({ record: EMPTY_RECORD }))); setStep(0); }} />;
   }
   return (
     <div className="stack">
@@ -476,7 +489,7 @@ function QuickIntro({ onStart, onExit }: { onStart: () => void; onExit: () => vo
       <div className="panel stack">
         <p className="x-m0"><span className="tag">Reference business</span> Each problem runs on a ready-made company: the reference path the team checked to the cent. It is not your company and nothing is saved. Your choices here show their projected effect on that business.</p>
         <ol className="x-list">
-          {QUICK.map((r) => <li key={r}><strong>{roundById(r).title}.</strong> {roundById(r).objective}</li>)}
+          {QUICK.map((r) => <li key={r}><strong>{endStop(roundById(r).title)}</strong> {roundById(r).objective}</li>)}
         </ol>
         <p className="x-m0 small">Score: 4 points for a right first answer with no hint, 2 after a hint or retry, 0 if you reveal it. 20 points in all.</p>
       </div>
@@ -498,9 +511,9 @@ function ScoreBar({ step, score, onExit }: { step: number; score: number; onExit
   );
 }
 
-function Summary({ title, kind, score, rows, extra, onExit, onAgain }: {
+function Summary({ title, kind, score, rows, extra, onExit, onAgain, onCareer }: {
   title: string; kind: 'quick' | 'bonus'; score: number; extra?: ReactNode;
-  rows: { id: string; title: string; record: MasteryRecord; choice: string; best?: boolean }[]; onExit: () => void; onAgain: () => void;
+  rows: { id: string; title: string; record: MasteryRecord; choice: string; best?: boolean }[]; onExit: () => void; onAgain: () => void; onCareer?: () => void;
 }) {
   const h = useFocusHeading(`${kind}-summary`);
   return (
@@ -528,10 +541,10 @@ function Summary({ title, kind, score, rows, extra, onExit, onAgain }: {
       </div>
       <section className="card">
         <h2 className="x-h3">Concept recap</h2>
-        <ul className="x-list">{rows.map((x) => <li key={x.id}><strong>{x.title}:</strong> {RECAP[x.id]}</li>)}</ul>
+        <ul className="x-list">{rows.map((x) => <li key={x.id}><strong>{endStop(x.title)}</strong> {RECAP[x.id]}</li>)}</ul>
       </section>
       <div className="btn-row">
-        {kind === 'quick' && <button className="btn primary" onClick={onExit}>Play the full career</button>}
+        {kind === 'quick' && onCareer && <button className="btn primary" onClick={onCareer}>Play the full career</button>}
         <button className="btn" onClick={onAgain}>Try again</button>
         <button className="btn" onClick={onExit}>Back to start</button>
       </div>

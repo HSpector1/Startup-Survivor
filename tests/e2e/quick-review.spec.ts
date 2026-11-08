@@ -31,6 +31,10 @@ test('Quick Challenge: five problems, feedback, decisions and a 20-point score',
     await page.getByRole('button', { name: 'Check answer' }).click();
     const tickets = page.locator('.ticket');
     await expect(tickets).toHaveCount(3);
+    // R10: catering is served first, so the 220-meal contract pushes 120 regular orders out of a 1,200-meal kitchen.
+    if (i === 1) await expect(tickets.nth(0)).toContainText(/Orders turned away in Month 1\s*120/);
+    // R17: the waste training and the renegotiated price keep paying in Month 4, so Month 4 is shown too.
+    if (i === 2) await expect(tickets.nth(0)).toContainText('Month 4 operating income');
     if (i === 4) await expect(tickets.nth(0)).toContainText('Not available'); // $13,915.10 cannot fund an $18,000 cash buy
     await tickets.nth(2).click();
     await expect(page.getByText(/is not automatically wrong/).first()).toBeVisible();
@@ -38,6 +42,9 @@ test('Quick Challenge: five problems, feedback, decisions and a 20-point score',
   }
   await expect(page.getByRole('heading', { level: 1, name: 'Quick Challenge results' })).toBeVisible();
   await expect(page.getByText(/18\s*\/\s*20|18 of 20/).first()).toBeVisible(); // 2 points lost to the retry on problem 1
+  await expect(page.getByText(/Should you open a second truck\? NPV/)).toBeVisible(); // no "?." in the recap
+  await page.getByRole('button', { name: 'Play the full career' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Open your food truck' })).toBeVisible(); // lands on setup, not the landing page
   expect(errors).toEqual([]);
 });
 
