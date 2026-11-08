@@ -83,7 +83,7 @@ describe('grading', () => {
   };
   it('accepts exact answers and tolerance edges', () => {
     expect(grade(spec('R04'), { value: 843 }).correct).toBe(true);
-    expect(grade(spec('R04'), { value: 842 })).toEqual({ correct: false, message: expect.stringMatching(/Round UP/) });
+    expect(grade(spec('R04'), { value: 842 })).toEqual({ correct: false, message: expect.stringMatching(/Round up/) });
     expect(grade(spec('R06'), { value: 6.63 }).correct).toBe(true);
     expect(grade(spec('R06'), { value: 6.62 }).correct).toBe(true);
     expect(grade(spec('R06'), { value: 6.64 }).correct).toBe(false);

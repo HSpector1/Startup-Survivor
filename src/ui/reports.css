@@ -1,0 +1,42 @@
+/* Reports, month close and final report. Only styles that styles.css lacks; same tokens. */
+
+/* row headers inside statement tables */
+.fin tbody th { text-align: left; font-weight: 400; }
+.fin tbody th.indent { padding-left: 1.5rem; }
+.fin tr.head th { font-weight: 700; padding-top: .9rem; border-bottom: 0; }
+.fin tr.group th, .fin tr.group td { font-weight: 700; }
+.fin tr.sub th { font-weight: 700; border-top: 1.5px solid var(--ink); }
+.fin tr.total th { font-weight: 800; border-top: 2px solid var(--ink); border-bottom: 3px double var(--ink); }
+.fin caption .tag { margin-left: .4rem; vertical-align: middle; }
+
+/* controls */
+.report-controls { display: flex; flex-wrap: wrap; gap: .75rem 1.25rem; align-items: end; }
+.picker { display: grid; gap: .25rem; }
+.picker label { font-weight: 600; font-size: .9rem; }
+.picker select { min-height: 44px; padding: .4rem .6rem; border: 2px solid var(--ink-2); border-radius: var(--r-s); background: var(--surface); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 2px solid var(--ink-2); border-radius: var(--r-s); overflow: hidden; }
+.seg button { border: 0; background: var(--surface); padding: .5rem .9rem; min-height: 44px; font-weight: 700; cursor: pointer; }
+.seg button + button { border-left: 2px solid var(--ink-2); }
+.seg button[aria-pressed='true'] { background: var(--panel); text-decoration: underline 3px; text-underline-offset: 4px; }
+
+/* capacity bar */
+.capbar { margin-bottom: .4rem; }
+.capbar > span { background: var(--basil); }
+
+/* rescue */
+.rescue { border: 3px solid var(--chili); border-radius: var(--r-m); background: var(--surface); padding: 18px 20px; }
+.rescue h2 { color: var(--chili); }
+.rescue-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 16px; }
+.rescue-options p { margin-top: .5rem; }
+
+/* final report */
+.final-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 320px); gap: 20px; align-items: center; }
+.final-head p:first-child { margin: 0; font-weight: 700; }
+.final-art { width: 100%; height: auto; }
+@media (max-width: 640px) { .final-head { grid-template-columns: minmax(0, 1fr); } }
+.final-score { font-family: var(--display); font-weight: 800; font-size: 2.6rem; line-height: 1; margin: .2rem 0 .6rem; }
+.diag { display: grid; grid-template-columns: 1fr auto; gap: .35rem .75rem; margin: 0 0 .75rem; }
+.diag dd { margin: 0; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.achievements { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; padding: 0; margin: 0; }
+.achievements li { padding: .25em .8em; border: 2px solid var(--saffron-deep); border-radius: 999px; font-weight: 700; }
+.copy-text { width: 100%; margin-top: .5rem; padding: .6rem; border: 1px solid var(--line); border-radius: var(--r-s); background: var(--surface); font: .85rem/1.5 ui-monospace, monospace; }

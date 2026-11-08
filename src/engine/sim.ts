@@ -3,7 +3,7 @@
 import { largestRemainder, pct, roundHalfUp, sum, type Cents, fmt } from './money';
 import {
   BASE_RECURRING, BASE_UNIT_COST, BASE_WASTE, BRIDGE_RATE_MONTHLY, CLOSE_AFTER, EFFECTS, NEUTRAL, OPENING_CAPITAL,
-  ROUND_IDS, SECOND_TRUCK, WEATHER, WRAP_LIST_PRICE, inSpan, roundPeriod,
+  RESERVE_FLOOR, ROUND_IDS, SECOND_TRUCK, WEATHER, WRAP_LIST_PRICE, inSpan, roundPeriod,
   type Effect, type ExpenseAccount, type MenuItem, type Month, type OptionId, type Period, type RoundId,
 } from './model';
 import { balanceSheet, cr, dr, event, incomeStatement, type JournalEvent, type Line } from './ledger';
@@ -342,7 +342,7 @@ export function runGame(input: GameInput, opts: { projection?: boolean } = {}): 
       if (close.cashAfter < 0) {
         const kind = input.rescues?.[m];
         if (kind) {
-          const amount = -close.cashAfter + 200_000;
+          const amount = -close.cashAfter + RESERVE_FLOOR;
           post(kind === 'equity'
             ? event(`M${m}-rescue`, r, m, 'Emergency owner contribution', [dr('cash', amount, 'Emergency owner contribution', { cf: 'financing' }), cr('ownerCapital', amount, 'Emergency owner contribution')])
             : event(`M${m}-rescue`, r, m, 'Emergency bridge loan', [dr('cash', amount, 'Emergency bridge loan proceeds', { cf: 'financing' }), cr('bridgeLoan', amount, 'Bridge loan at 1.5% per month')]));

@@ -52,9 +52,9 @@ export const OVERLAY: Record<RoundId, Overlay> = {
   R03: { format: 'Dollars per bowl', unitLabel: '$', coach: 'A higher price earns more per bowl but sells fewer. The right price depends on your capacity and your fixed costs.',
     mistakes: [{ value: 12, message: '$12 is the selling price. Contribution margin subtracts the $5 variable cost.' }, { value: 0.5833, message: 'That is the CM ratio. The question asks for dollars of contribution per bowl.' }, { value: 58.33, message: 'That is the CM ratio as a percent. The question asks for dollars per bowl.' }] },
   R04: { format: 'Whole meals per month', unitLabel: 'meals', coach: 'Publicity buys demand, training buys capacity, holding cash buys safety. Check whether your truck is short on demand or short on capacity.',
-    mistakes: [{ value: 842, message: 'Round UP. At 842 bowls the business is still $1 short of covering fixed costs.' }, { value: 815, message: 'You left out the $200 depreciation. Break-even on operating profit includes every fixed cost, cash or not.' }, { value: 492, message: 'Divide by contribution margin ($7), not the selling price ($12).' }, { value: 491, message: 'Divide by contribution margin ($7), not the selling price ($12).' }] },
+    mistakes: [{ value: 842, message: 'Round up. At 842 bowls the business is still $1 short of covering fixed costs.' }, { value: 815, message: 'You left out the $200 depreciation. Break-even on operating profit includes every fixed cost, cash or not.' }, { value: 492, message: 'Divide by contribution margin ($7), not the selling price ($12).' }, { value: 491, message: 'Divide by contribution margin ($7), not the selling price ($12).' }] },
   R05: { format: 'Whole meals per month', unitLabel: 'meals', coach: 'Advertising raises fixed cost and demand together. It pays only if the extra contribution beats the extra spending, and only if you have capacity to serve it.',
-    mistakes: [{ value: 1057, message: 'Round UP: 1,057.14 bowls is not enough to reach $1,500.' }, { value: 843, message: 'That is break-even. A profit target adds the $1,500 to the fixed costs before dividing.' }, { value: 215, message: 'You divided only the target profit by CM. Fixed costs must be covered too.' }] },
+    mistakes: [{ value: 1057, message: 'Round up: 1,057.14 bowls is not enough to reach $1,500.' }, { value: 843, message: 'That is break-even. A profit target adds the $1,500 to the fixed costs before dividing.' }, { value: 215, message: 'You divided only the target profit by CM. Fixed costs must be covered too.' }] },
   R06: { format: 'Dollars per meal, up to 3 decimals', unitLabel: '$', modules: '16: sales-mix CVP',
     coach: 'More wraps add demand but each wrap earns less than a bowl, and a bigger menu costs money to support.',
     mistakes: [{ value: 6.25, message: 'That is a simple average of $7 and $5.50. Weight each margin by its share of the mix.' }, { value: 11.5, message: 'You weighted the prices, not the contribution margins.' }] },
@@ -65,7 +65,7 @@ export const OVERLAY: Record<RoundId, Overlay> = {
   R09: { format: 'Dollars for one month', unitLabel: '$', coach: 'Hiring is a step cost that lasts; overtime is a variable cost that only hits extra meals. Which fits a demand surge that may not last?',
     mistakes: [{ value: 840, message: 'Subtract the $2 overtime premium from the $7 margin on each overflow order.' }, { value: 240, message: 'Overtime is $2 per overflow order, so subtract it from the $7 margin: $5 × 120.' }, { value: -50, message: 'Hiring costs $650 and lasts all month; the question asks about overtime on 120 orders.' }] },
   R10: { format: 'Dollars of incremental profit', unitLabel: '$', coach: 'Catering gets first claim on capacity. If the truck is full, regular customers lose their seats, and that lost margin is a real cost.',
-    mistakes: [{ value: 700, message: 'You left out the $180 setup fee.' }, { value: 800, message: 'Each catered bowl costs $5 plus $1 transport, so $6, not $5.' }, { value: 1540, message: 'That is the catering revenue. Subtract the $6 variable cost per bowl and the $180 setup.' }] },
+    mistakes: [{ value: 700, message: 'You left out the $180 setup fee.' }, { value: 660, message: 'Each catered bowl costs $5 plus $1 transport, so $6, not $5: 140 × ($11 − $6) − $180.' }, { value: 1540, message: 'That is the catering revenue. Subtract the $6 variable cost per bowl and the $180 setup.' }] },
   R11: { format: 'Dollars of contribution lost per month', unitLabel: '$', coach: 'Absorbing protects volume, a price rise protects margin, switching suppliers costs a fee up front. Compare total contribution, not per-unit margin alone.',
     mistakes: [{ value: 200, message: '$0.20 is the replacement supplier\'s surcharge. The question asks about absorbing the full $0.60 increase.' }] },
   R12: { format: 'Whole portions per month', unitLabel: 'portions', modules: '17: make-or-buy',
@@ -85,20 +85,20 @@ export const OVERLAY: Record<RoundId, Overlay> = {
     coach: 'Weather is outside your control. Cutting shifts saves cash but also capacity; a promotion wins some customers back at a price.',
     mistakes: [{ value: 1584, message: 'That uses the $12 price, which gives the revenue-based sales volume variance. This question asks for the contribution-based version, at $7 per meal.' }, { value: 132, message: 'That is the change in meals. Multiply it by the $7 budgeted contribution per meal.' }] },
   R17: { format: 'Amount and direction (F or U)', unitLabel: '$', variance: 'U',
-    prompt: 'What is the TOTAL direct-materials variance in the audit (price variance + quantity variance)? Enter the amount and mark it F or U.',
+    prompt: 'What is the total direct-materials variance in the audit (price variance + quantity variance)? Enter the amount and mark it F or U.',
     worked: 'Standard quantity allowed = 900 meals × 2.0 = 1,800 units. Price variance = ($1.65 − $1.50) × 1,980 actual units used = $297 U. Quantity variance = (1,980 − 1,800) × $1.50 = $270 U. Total = $567 U. Under the just-in-time assumption, quantity purchased equals quantity used.',
     coach: 'Training attacks waste (a quantity problem). Renegotiating attacks price. They fix different causes.',
-    mistakes: [{ value: 297, message: 'That is only the price variance. Add the quantity variance: (1,980 − 1,800) × $1.50 = $270.' }, { value: 270, message: 'That is only the quantity variance. Add the price variance: $0.15 × 1,980 = $297.' }, { value: 540, message: 'Price variance uses ACTUAL quantity (1,980), not standard quantity (1,800).' }] },
+    mistakes: [{ value: 297, message: 'That is only the price variance. Add the quantity variance: (1,980 − 1,800) × $1.50 = $270.' }, { value: 270, message: 'That is only the quantity variance. Add the price variance: $0.15 × 1,980 = $297.' }, { value: 540, message: 'Price variance uses actual quantity (1,980), not standard quantity (1,800).' }] },
   R18: { format: 'Amount and direction (F or U)', unitLabel: '$', variance: 'U',
     prompt: 'What is the total labor variance for the projected shift (rate variance + efficiency variance)? Enter the amount and mark it F or U.',
     worked: 'Rate variance = ($22 − $20) × 198 actual hours = $396 U. Efficiency variance = (198 − 180 standard hours allowed for actual output) × $20 = $360 U. Total = $756 U, which equals $4,356 actual − $3,600 standard.',
     coach: 'Each fix costs money now to save more later. Compare total cost (fee + remaining overrun), not just the fee.',
-    mistakes: [{ value: 396, message: 'That is only the rate variance. Add the efficiency variance: 18 extra hours × $20 = $360.' }, { value: 360, message: 'That is only the efficiency variance. Add the rate variance: $2 × 198 hours = $396.' }, { value: 720, message: 'The rate variance uses ACTUAL hours (198), not standard hours (180).' }] },
+    mistakes: [{ value: 396, message: 'That is only the rate variance. Add the efficiency variance: 18 extra hours × $20 = $360.' }, { value: 360, message: 'That is only the efficiency variance. Add the rate variance: $2 × 198 hours = $396.' }, { value: 720, message: 'The rate variance uses actual hours (198), not standard hours (180).' }] },
   R19: { format: 'Amount and direction (F or U)', unitLabel: '$', variance: 'U', modules: '23: flexible budgets; responsibility reports',
     prompt: 'What is the flexible-budget operating-income variance (actual income compared with the flexible budget)? Enter the amount and mark it F or U.',
     worked: 'Flexible budget at 900 meals = 900 × ($12 − $5) − $5,900 = $400. Actual $250 − flexible $400 = −$150, so $150 U. The separate net sales volume variance is $400 − $1,100 = $700 U.',
     coach: 'Investigating costs nothing today. Cutting marketing saves cash but loses customers; raising prices restores margin but loses customers too.',
-    mistakes: [{ value: 850, message: 'You compared actual income with the STATIC budget ($1,100). The flexible budget is $400 at the 900 meals actually sold.' }, { value: 700, message: 'That is the net sales volume variance (flexible − static). The question asks for actual compared with flexible.' }] },
+    mistakes: [{ value: 850, message: 'You compared actual income with the static budget ($1,100). The flexible budget is $400 at the 900 meals actually sold.' }, { value: 700, message: 'That is the net sales volume variance (flexible − static). The question asks for actual compared with flexible.' }] },
   R20: { format: 'Dollars of company profit lost', unitLabel: '$', coach: 'An allocated loss is not a reason to drop a line. Ask what you would actually stop earning and stop paying.',
     mistakes: [{ value: 2200, message: 'That is wrap contribution margin. Subtract the $300 of avoidable fixed costs that would go away.' }, { value: -300, message: 'You subtracted the $2,200 common overhead. It continues whether or not you sell wraps, so it is irrelevant.' }, { value: 4000, message: 'That is wrap revenue. Subtract variable costs and avoidable fixed costs.' }] },
   R21: { format: 'Dollars of profit contribution', unitLabel: '$', modules: '5: receivables; financial statement analysis',
@@ -113,7 +113,7 @@ export const OVERLAY: Record<RoundId, Overlay> = {
     worked: 'PV of $6,500 for 4 years at 12% = $19,742.77. PV of $3,000 resale at Year 4 = $1,906.55. NPV = −$18,000 + $19,742.77 + $1,906.55 = +$3,649.32, about +$3,649. The 12% is the discount rate (cost of capital) for this project. The loan does not change it.',
     mistakes: [{ value: 1743, message: 'You left out the $3,000 resale in Year 4 (PV $1,906.55).' }, { value: 11000, message: 'You did not discount the cash flows.' }, { value: 10849, message: 'Financing does not enter unlevered NPV. Use the full $18,000 investment, not the $7,200 down payment.' }] },
   R25: { format: 'Dollars of book equity', unitLabel: '$', coach: 'Paying yourself is allowed, but it reduces equity and cash. Prepaying advertising is an asset until the campaign runs.',
-    mistakes: [{ value: 16000, message: 'Equity is assets MINUS liabilities.' }, { value: 4000, message: 'That is the liability balance. Equity = $12,000 − $4,000.' }] },
+    mistakes: [{ value: 16000, message: 'Equity is assets minus liabilities, not plus.' }, { value: 4000, message: 'That is the liability balance. Equity = $12,000 − $4,000.' }] },
 };
 
 export const ROUNDS: RoundSpec[] = specs.rounds as RoundSpec[];
@@ -125,5 +125,5 @@ export const promptOf = (r: RoundSpec) => OVERLAY[r.id].prompt ?? r.mastery_chec
 export const workedOf = (r: RoundSpec) => OVERLAY[r.id].worked ?? r.mastery_check.worked_solution;
 export const modulesOf = (r: RoundSpec) => OVERLAY[r.id].modules ?? r.modules;
 
-/** Bonus option feedback: A is the course-correct choice in every bonus case. */
-export const BONUS_BEST: Record<string, OptionId> = { B1: 'A', B2: 'B', B3: 'A', B4: 'A', B5: 'A' };
+/** Best judgment per bonus case. B2: declining (B) beats hiring (A) by $50, and the one-time $200 throughput fix (C) beats both at +$150, so C is best. */
+export const BONUS_BEST: Record<string, OptionId> = { B1: 'A', B2: 'C', B3: 'A', B4: 'A', B5: 'A' };
