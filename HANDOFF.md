@@ -17,6 +17,9 @@ Last writer: Claude (Opus 5.5), 2026-11-08
 - `npx playwright test`: 16 passed locally (adds calculator and mastery-sales tests); the earlier 12 also passed against the live Pages site (`BASE_URL=https://hspector1.github.io/Startup-Survivor/`), desktop 1440px and mobile 375px: full career through the UI ends at the validator's numbers (cash $6,715.10, equity $28,315.10), reload/resume, keyboard-only round, no horizontal scroll, Quick Challenge with feedback and score.
 - Three independent reviews ran: a spec audit with its own Python simulator (matches to the cent), a formula and terminology check against the Easton 7e workbooks, and per-screen self-checks by the UI builders. Their findings are resolved in `docs/IMPLEMENTATION_AUDIT.md` (A1 to A23).
 
+## Independent review, 2026-11-08
+- Five small PRs are open for Claude to review and merge (#1 F/U attempt scoring, #2 Quick Challenge projections, #3 diagnostics, #4 dashboard pro forma, #5 mobile tables). Findings, what was verified and what was left as recommendations: `docs/REVIEW_2026-11-08.md`. No engine number changed.
+
 ## Next step
 1. Team accounting review: read `docs/IMPLEMENTATION_AUDIT.md`, play one Full Career, and sign off or change the rules in its "Design observations for the team" section (dominated options R15B, R17B, R18A, R23B, and the 0.92 price response).
 2. Peer-review test on a phone: open the Pages link, run the Quick Challenge, note anything unclear.
