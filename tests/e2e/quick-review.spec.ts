@@ -27,8 +27,15 @@ test('Quick Challenge: five problems, feedback, decisions and a 20-point score',
       await expect(page.getByText(/Round up/)).toBeVisible();
     }
     await page.getByLabel('Your answer').fill(q.value);
+    if (i === 2) {
+      // The right amount without a direction asks for F/U and must not cost an attempt.
+      await page.getByRole('button', { name: 'Check answer' }).click();
+      await expect(page.getByText(/mark the direction/)).toBeVisible();
+      await expect(page.getByText('Attempts: 0')).toBeVisible();
+    }
     if (q.u) await page.getByText('U (unfavorable)').click();
     await page.getByRole('button', { name: 'Check answer' }).click();
+    if (i === 2) await expect(page.getByText(/You earned 4 of 4 points/)).toBeVisible();
     const tickets = page.locator('.ticket');
     await expect(tickets).toHaveCount(3);
     if (i === 4) await expect(tickets.nth(0)).toContainText('Not available'); // $13,915.10 cannot fund an $18,000 cash buy
