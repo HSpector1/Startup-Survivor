@@ -179,6 +179,13 @@ table { border-collapse: collapse; width: 100%; }
 .fin tr.total td { font-weight: 800; border-top: 2px solid var(--ink); border-bottom: 3px double var(--ink); }
 .fin td.indent { padding-left: 1.5rem; }
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-hint { margin: .3rem 0 0; }
+/* Phones: tighter statement tables so more columns fit before the container has to scroll. */
+@media (max-width: 480px) {
+  .fin { font-size: .875rem; }
+  .fin th, .fin td { padding: .38rem .4rem; }
+  .fin td.indent, .fin tbody th.indent { padding-left: 1rem; }
+}
 .identity { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; font-weight: 700; }
 .journal-entry { border: 1px solid var(--line); border-radius: var(--r-s); padding: .6rem .8rem; background: var(--surface); }
 .journal-entry + .journal-entry { margin-top: .6rem; }
