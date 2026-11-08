@@ -1,0 +1,1131 @@
+{
+  "title": "Startup Survivor: Build a Food Truck Empire",
+  "version": "1.0 build specification",
+  "status": "Original game-design proposal; not a working game",
+  "course": "Auburn MBA BUSI 7230 Cost Analysis and Systems, Fall 2026",
+  "capital_initial": 25000,
+  "core_round_count": 25,
+  "optional_challenge_count": 5,
+  "chapters": [
+    "Start Up",
+    "Grow",
+    "Cost Crisis",
+    "Financial Trouble",
+    "CFO/Expansion"
+  ],
+  "rounds": [
+    {
+      "id": "R01",
+      "number": 1,
+      "chapter": 1,
+      "title": "Buy your first truck",
+      "modules": "Financial statement foundations / depreciation",
+      "objective": "Differentiate a capitalized asset purchase from an operating expense.",
+      "scenario": "The owner invests $25,000 cash. A working truck includes equipment and will be depreciated straight-line over 60 months with zero salvage value. All three options can serve the same menu, but have different monthly capacity.",
+      "mastery_check": {
+        "prompt": "With a $12,000 truck, how much cash remains immediately after the purchase?",
+        "formula": "Cash after purchase = $25,000 - truck purchase price.",
+        "worked_solution": "$25,000 - $12,000 = $13,000; monthly depreciation = $12,000 / 60 = $200.",
+        "answer": 13000,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "An equipment purchase is not an immediate $12,000 operating expense. It exchanges one asset, cash, for another, equipment. Depreciation allocates the cost over its useful life."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Used truck - $12,000",
+          "effect": "Dr Equipment 12,000 / Cr Cash 12,000; capacity 1,200 meals/month; monthly depreciation $200, beginning Month 1."
+        },
+        {
+          "id": "B",
+          "label": "Refurbished truck - $15,000",
+          "effect": "Dr Equipment 15,000 / Cr Cash 15,000; capacity 1,550 meals/month; monthly depreciation $250."
+        },
+        {
+          "id": "C",
+          "label": "Premium truck - $19,000",
+          "effect": "Dr Equipment 19,000 / Cr Cash 19,000; capacity 2,100 meals/month; monthly depreciation $316.67, with final-month rounding catch-up."
+        }
+      ],
+      "accounting_posting": "On purchase: Assets Cash decreases; PPE increases equally; profit unchanged. At each month-end: Dr Depreciation Expense / Cr Accumulated Depreciation.",
+      "designer_notes": "The premium option leaves little early liquidity; do not automatically mark it wrong. Ask the student to defend cash-versus-capacity tradeoffs.",
+      "timing": "Startup planning before Month 1"
+    },
+    {
+      "id": "R02",
+      "number": 2,
+      "chapter": 1,
+      "title": "Choose where to park and prepare food",
+      "modules": "15: cost behavior",
+      "objective": "Distinguish fixed rent from a per-order variable service fee and identify an activity-level crossover.",
+      "scenario": "Every facility requires an $800 refundable deposit. All leases provide access to a safe, fully permitted operating site. Other baseline cash costs are payroll $3,600, utilities $350, insurance $250, and marketing $200 per month.",
+      "mastery_check": {
+        "prompt": "At 1,000 orders, which of these two location contracts costs less: Economy at $900 + $0.50 per order, or Standard at $1,300?",
+        "formula": "Economy = $900 + $0.50*Q; Standard = $1,300; crossover Q = (1,300-900)/0.50 = 800.",
+        "worked_solution": "At 1,000 meals, Economy costs $1,400 and Standard costs $1,300; Standard is cheaper by $100.",
+        "answer": 1300,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "At low volumes, the fixed-plus-variable contract may be cheaper. At higher volumes, the flat lease can win. The deposit is an asset, not rent expense."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Economy site",
+          "effect": "Refundable cash deposit $800 becomes Deposits asset; recurring cash rent $900/month plus variable location fee $0.50 for every fulfilled order; no additional demand."
+        },
+        {
+          "id": "B",
+          "label": "Standard site",
+          "effect": "Same $800 deposit; recurring fixed cash rent $1,300/month; no per-order fee; no additional demand."
+        },
+        {
+          "id": "C",
+          "label": "High-traffic site",
+          "effect": "Same $800 deposit; recurring fixed cash rent $1,900/month; adds 250 regular prospective orders/month, subject to capacity."
+        }
+      ],
+      "accounting_posting": "Dr Refundable Deposits 800 / Cr Cash 800. Recognize actual rent and economy service fees as monthly expenses when incurred.",
+      "designer_notes": "Mastery numeric answer $1,300 tests selection via cheapest cost; UI also shows $1,400 Economy and $800-order crossover.",
+      "timing": "Startup planning before Month 1"
+    },
+    {
+      "id": "R03",
+      "number": 3,
+      "chapter": 1,
+      "title": "Price your signature bowl",
+      "modules": "16: CVP; 21: pricing",
+      "objective": "Calculate contribution margin and see how price influences both unit economics and demand.",
+      "scenario": "Base bowl variable cost is $5: non-sauce ingredients $2.50, sauce $1.30, packaging $0.80, and payment fee $0.40. The below demand estimates are original game assumptions, not external market data.",
+      "mastery_check": {
+        "prompt": "At a $12 price and $5 variable cost, what is the contribution margin per bowl?",
+        "formula": "Unit CM = selling price - unit variable cost; CM ratio = CM / selling price.",
+        "worked_solution": "$12 - $5 = $7 per bowl; CM ratio = $7 / $12 = 58.33%.",
+        "answer": 7,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "Revenue is not profit. Only the difference between selling price and variable cost contributes to covering fixed costs and operating income."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Value price - $10",
+          "effect": "Set bowl price $10; regular baseline demand 1,250 bowls/month before capacity, location and promotion effects; base CM $5."
+        },
+        {
+          "id": "B",
+          "label": "Balanced price - $12",
+          "effect": "Set bowl price $12; baseline demand 1,100 bowls/month; base CM $7."
+        },
+        {
+          "id": "C",
+          "label": "Premium price - $14",
+          "effect": "Set bowl price $14; baseline demand 850 bowls/month; base CM $9."
+        }
+      ],
+      "accounting_posting": "No journal entry on pricing selection. Recognize revenue and variable expenses for actual fulfilled orders at month close.",
+      "designer_notes": "No fixed best price: the best choice depends on facility choice, capacity, promotion choices and later cost shocks.",
+      "timing": "Startup planning before Month 1"
+    },
+    {
+      "id": "R04",
+      "number": 4,
+      "chapter": 1,
+      "title": "Find your break-even point",
+      "modules": "15: cost classification; 16: CVP",
+      "objective": "Compute break-even units using recurring fixed expenses, depreciation and all variable per-order costs.",
+      "scenario": "A basic launch planning case uses monthly fixed cash costs: payroll $3,600; utilities $350; insurance $250; marketing $200; standard location rent $1,300. Used truck depreciation is $200. Bowl price is $12 and unit variable cost $5.",
+      "mastery_check": {
+        "prompt": "How many bowls per month must this business sell to break even on operating profit?",
+        "formula": "Fixed operating costs = 3600+350+250+200+1300+200=5900; BE units = CEILING(5900/(12-5)).",
+        "worked_solution": "$5,900 / $7 = 842.857; round UP to 843 bowls. At 842 bowls, operating income is still negative.",
+        "answer": 843,
+        "unit": "meals",
+        "tolerance": 0,
+        "feedback_for_wrong_answers": "Break-even uses contribution margin, not selling price. Round UP because selling part of a meal is not an option. One-time launch costs should not be silently mixed into a recurring baseline."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Launch-day publicity",
+          "effect": "One-time marketing cash payment/expense $250 in Month 1; raises Month 1 regular demand by 130 meals, subject to capacity."
+        },
+        {
+          "id": "B",
+          "label": "Service-speed workshop",
+          "effect": "One-time training cash payment/expense $180 in Month 1; increases Month 1 capacity by 100 meals; no recurring boost."
+        },
+        {
+          "id": "C",
+          "label": "Preserve the cash",
+          "effect": "No change to cost, demand or capacity."
+        }
+      ],
+      "accounting_posting": "At Month 1 close, recognize the one-time marketing/training expense and cash outflow if selected.",
+      "designer_notes": "Actual game quiz calculates from the chosen truck, location, price and recurring costs; the $843 example is a fixed instructional reference case.",
+      "timing": "Startup planning before Month 1"
+    },
+    {
+      "id": "R05",
+      "number": 5,
+      "chapter": 1,
+      "title": "Set the first operating profit target",
+      "modules": "16: target-profit CVP; 22: budgeting",
+      "objective": "Calculate the units required to achieve a target operating profit and choose a demand-generation budget.",
+      "scenario": "Use the same standalone reference case as Round 4: fixed operating costs $5,900/month, bowl CM $7/unit. The owner wants $1,500 monthly operating profit.",
+      "mastery_check": {
+        "prompt": "How many bowls are needed to earn $1,500 of operating profit?",
+        "formula": "Target units = CEILING((fixed operating costs + target profit) / unit contribution margin).",
+        "worked_solution": "($5,900 + $1,500)/$7 = 1,057.14, so 1,058 meals.",
+        "answer": 1058,
+        "unit": "meals",
+        "tolerance": 0,
+        "feedback_for_wrong_answers": "To reach a specific profit target, fixed costs AND desired profit must be covered by contribution margin. The advertising decision changes both sides of the profit equation."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Growth-first advertising",
+          "effect": "Add $300 to recurring monthly fixed marketing expense beginning Month 1; add 200 to regular monthly demand from Month 1 onward."
+        },
+        {
+          "id": "B",
+          "label": "Moderate advertising",
+          "effect": "Add $150 to recurring fixed marketing beginning Month 1; add 120 to regular demand from Month 1 onward."
+        },
+        {
+          "id": "C",
+          "label": "Operate lean",
+          "effect": "No extra fixed marketing and no extra demand; preserve liquidity."
+        }
+      ],
+      "accounting_posting": "Marketing is expensed monthly when services are received and paid. Its expected demand benefit does not create an asset or revenue until sales occur.",
+      "designer_notes": "Checkpoint 1: display opening cash, truck capacity, unit CM, planned break-even, intended target units and one-sentence learning summary.",
+      "timing": "Startup planning before Month 1"
+    },
+    {
+      "id": "R06",
+      "number": 6,
+      "chapter": 2,
+      "title": "Add a second menu item",
+      "modules": "16: sales-mix CVP; 18: product costing",
+      "objective": "Use a weighted-average contribution margin for a multi-product business.",
+      "scenario": "A wrap sells for $10 and costs $4.50 per unit: non-sauce ingredients $2, sauce $1.30, packaging $0.80 and payment $0.40. Bowls sell for $12 with $5 variable cost in the reference case.",
+      "mastery_check": {
+        "prompt": "With a mix of 75% bowls and 25% wraps, what is the weighted-average contribution margin per meal?",
+        "formula": "WACM = bowl mix * ($12-$5) + wrap mix * ($10-$4.50).",
+        "worked_solution": "0.75*$7 + 0.25*$5.50 = $6.625 per meal (display $6.63; retain full precision internally).",
+        "answer": 6.625,
+        "unit": "USD",
+        "tolerance": 0.005,
+        "feedback_for_wrong_answers": "A greater number of sales does not always mean more profit. Use weighted contribution margin and account for the added recurring menu-support cost."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Lean two-item menu",
+          "effect": "Keep a simple menu with 90% bowls and 10% wraps; no complexity fee or new demand."
+        },
+        {
+          "id": "B",
+          "label": "Balanced menu",
+          "effect": "25% of regular monthly orders are wraps; new monthly regular demand +100 orders; recurring cash menu-support cost $120/month."
+        },
+        {
+          "id": "C",
+          "label": "Wrap-forward menu",
+          "effect": "45% of regular monthly orders are wraps; new monthly demand +180 orders; recurring cash menu-support cost $200/month."
+        }
+      ],
+      "accounting_posting": "All sales and associated actual variable expenses are recognized only when orders are fulfilled; recurring menu support is included in fixed monthly cash operating expense.",
+      "designer_notes": "To avoid fraction-of-a-meal errors, allocate whole units via largest-remainder rounding; bowl + wrap units must equal the regular-orders total.",
+      "timing": "Month 1 operating decisions"
+    },
+    {
+      "id": "R07",
+      "number": 7,
+      "chapter": 2,
+      "title": "Should you join a delivery platform?",
+      "modules": "17: relevant costs; 21: channel pricing",
+      "objective": "Evaluate a new sales channel based on incremental contribution and available capacity.",
+      "scenario": "A delivery app expects 180 additional bowl orders/month. It charges 25% of the bowl selling price per app order. A direct-order campaign offers 100 extra orders/month but costs $150/month.",
+      "mastery_check": {
+        "prompt": "For a $12 bowl with $5 variable costs and a 25% app commission, what is contribution margin on ONE app order?",
+        "formula": "App-order CM = bowl price - bowl unit cost - app commission rate * bowl price.",
+        "worked_solution": "$12 - $5 - (0.25*$12) = $4 per delivery order.",
+        "answer": 4,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "App sales may look attractive in revenue terms but only the contribution AFTER the app fee covers fixed costs. At capacity, new channel orders may displace more profitable walk-in sales."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Join the app",
+          "effect": "Add a distinct app-order channel with 180 monthly bowl orders; app fee 25% of collected selling price per fulfilled app order; no new fixed fee."
+        },
+        {
+          "id": "B",
+          "label": "Promote direct online orders",
+          "effect": "Add distinct direct-pickup channel with 100 monthly bowl orders; add recurring marketing cash cost $150/month; no commission."
+        },
+        {
+          "id": "C",
+          "label": "Stick to walk-up orders",
+          "effect": "No channel cost and no added channel demand."
+        }
+      ],
+      "accounting_posting": "At month close post actual channel gross sales as Revenue, app percentage as selling expense, direct per-order costs as variable expense, and fixed direct marketing separately.",
+      "designer_notes": "Channel demand is not guaranteed fulfilled sales; a documented capacity allocator must avoid counting demand exceeding the truck's capacity.",
+      "timing": "Month 1 operating decisions"
+    },
+    {
+      "id": "R08",
+      "number": 8,
+      "chapter": 2,
+      "title": "Run a discount promotion",
+      "modules": "16: incremental CVP; 21: pricing",
+      "objective": "Evaluate how a discount applied to existing customers can destroy margin even when it increases unit sales.",
+      "scenario": "An illustrative test has 1,100 full-price bowl orders at $12 price and $5 unit cost. A blanket $1 discount brings 200 new meals, but also reduces the price of all 1,100 orders that would have purchased anyway.",
+      "mastery_check": {
+        "prompt": "Without a capacity limit, what is the incremental contribution from the blanket $1 discount?",
+        "formula": "Delta CM = new orders*(discounted price - variable cost) - existing orders*discount amount.",
+        "worked_solution": "200*($11-$5) - 1,100*$1 = $1,200 - $1,100 = +$100, before any extra marketing expense.",
+        "answer": 100,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "The blanket promotion gives a price reduction to existing customers too. Its financial outcome may turn negative once real capacity constraints are applied."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Discount ALL walk-up orders by $1",
+          "effect": "In Month 1 only, subtract $1 from selling price of every regular bowl/wrap order, and add 200 potential regular orders before capacity allocation."
+        },
+        {
+          "id": "B",
+          "label": "Target new customers only",
+          "effect": "In Month 1 only, spend $100 marketing; add 120 distinct coupon-only bowl orders priced at bowl price minus $1; existing orders retain full price."
+        },
+        {
+          "id": "C",
+          "label": "No promotion",
+          "effect": "No discount, marketing or new promotional demand."
+        }
+      ],
+      "accounting_posting": "Discounts reduce transaction revenue; the $100 targeted campaign is separately expensed. Store eligible channel and price for each order cohort.",
+      "designer_notes": "Never calculate discount gains using only incremental units. Include margin lost on customers who were already buying.",
+      "timing": "Month 1 operating decisions"
+    },
+    {
+      "id": "R09",
+      "number": 9,
+      "chapter": 2,
+      "title": "Increase service capacity",
+      "modules": "15: step costs; 17: relevant capacity costs",
+      "objective": "Compare added fixed hiring expense with variable overtime to relieve a capacity bottleneck.",
+      "scenario": "A used truck normally serves 1,200 orders/month. For an isolated 120-order overflow at $7 regular CM, a part-time employee costs $650/month and overtime costs $2 for each order served above base capacity.",
+      "mastery_check": {
+        "prompt": "If all 120 overflow orders can be served, what is the ONE-MONTH incremental operating profit from overtime?",
+        "formula": "Overtime delta profit = overflow units * (ordinary unit CM - extra overtime cost per unit).",
+        "worked_solution": "120*($7-$2) = $600 incremental operating profit for the month.",
+        "answer": 600,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "Labor is neither always fixed nor always variable. Hiring can be a step-fixed cost, while overtime can add variable cost only to units produced beyond normal capacity."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Hire a part-time employee",
+          "effect": "Increase capacity +300 meals/month from this month onward; recurring cash payroll expense +$650/month."
+        },
+        {
+          "id": "B",
+          "label": "Use overtime this month",
+          "effect": "Increase capacity +180 meals for Month 1 only; charge an extra $2 variable overtime for each fulfilled meal above the pre-R9 capacity threshold, maximum 180."
+        },
+        {
+          "id": "C",
+          "label": "Keep the current crew",
+          "effect": "No capacity or expense change; potential orders above capacity are unfilled."
+        }
+      ],
+      "accounting_posting": "Recognize part-time pay in monthly payroll or temporary overtime expense based on actual overflow fulfilled. No salaries are capitalized.",
+      "designer_notes": "Keep a separate base-capacity threshold so overtime is not incorrectly charged on every meal sold.",
+      "timing": "Month 1 operating decisions"
+    },
+    {
+      "id": "R10",
+      "number": 10,
+      "chapter": 2,
+      "title": "Win a catering contract",
+      "modules": "17: special-order decisions; 16: capacity opportunity cost",
+      "objective": "Evaluate a special order using incremental revenues, relevant costs, and displaced ordinary sales.",
+      "scenario": "A client offers a one-time Month 1 event. Each catered bowl costs the ordinary bowl variable cost ($5 in the reference case) plus $1 extra event packaging/transport. Event setup is $180.",
+      "mastery_check": {
+        "prompt": "Ignoring capacity constraints, what is the incremental profit from 140 catered bowls sold at $11 each?",
+        "formula": "Catering contribution - setup = Q*(event price - (bowl variable cost + $1)) - setup fee.",
+        "worked_solution": "140*($11-$6)-$180 = $520 incremental operating profit, before displaced regular business.",
+        "answer": 520,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "The $520 result is true only IF the new order does not displace more profitable customers. Opportunity cost = contribution lost on displaced orders; subtract it from incremental catering profit."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Accept all 220 meals at $9",
+          "effect": "Contract 220 bowls for $9 each; variable cost = live bowl cost + $1 per meal; one-time $180 setup expense; event orders receive first capacity priority."
+        },
+        {
+          "id": "B",
+          "label": "Negotiate 140 meals at $11",
+          "effect": "Contract 140 bowls for $11 each; variable cost = live bowl cost + $1 per meal; same $180 setup; event orders receive first capacity priority."
+        },
+        {
+          "id": "C",
+          "label": "Decline the contract",
+          "effect": "No catering sales or setup expense; preserve capacity for regular and delivery customers."
+        }
+      ],
+      "accounting_posting": "Catering cash received upon service. Recognize revenue and related direct costs in Month 1; setup is a period expense. Close Month 1 and generate the first operating income statement.",
+      "designer_notes": "Close Month 1 after this round. The standard fulfillment order is catering contract -> walk-up regular -> direct pickup/coupons -> app delivery, always subject to capacity. Revenue is based on served, not desired, meals.",
+      "timing": "Month 1 operating decisions"
+    },
+    {
+      "id": "R11",
+      "number": 11,
+      "chapter": 3,
+      "title": "Ingredient prices jump",
+      "modules": "15: cost behavior; 21: pricing response",
+      "objective": "Analyze a commodity-cost increase and decide whether to absorb, pass on, or reduce the increase.",
+      "scenario": "A supplier shock adds $0.60 of non-sauce ingredient cost per meal. A replacement supplier would limit the increase to $0.20 but charges a $240 onboarding fee. Price increases of $1 reduce prospective price-sensitive demand by 8% (game assumption).",
+      "mastery_check": {
+        "prompt": "If 1,000 meals are sold and the business absorbs the full cost increase, how much does operating contribution decline?",
+        "formula": "Change in total variable costs = actual meals * added variable cost per meal.",
+        "worked_solution": "1,000*$0.60 = $600 decrease in monthly contribution, all else equal.",
+        "answer": 600,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "A price increase may restore unit CM but lose customers. Compare total expected contribution at realistic demand rather than assuming passing on cost is always best."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Absorb the entire increase",
+          "effect": "Permanently add $0.60 to non-sauce ingredients per fulfilled meal beginning Month 2; no price or demand change."
+        },
+        {
+          "id": "B",
+          "label": "Raise every current menu price by $1",
+          "effect": "Permanently add $0.60 non-sauce cost per meal AND raise currently offered bowl/wrap prices by $1; multiply future price-sensitive demand by 0.92. The later premium price is set explicitly in Round 14."
+        },
+        {
+          "id": "C",
+          "label": "Switch ingredient suppliers",
+          "effect": "Permanently add only $0.20 non-sauce cost per meal; expense/pay $240 one-time onboarding in Month 2; no menu price or demand change."
+        }
+      ],
+      "accounting_posting": "Ingredient surcharge is variable food cost as sold; onboarding fee is a one-time period expense when incurred and paid.",
+      "designer_notes": "Do not apply the $0.60 shock first and then add an additional $0.20 for the switch. Selected post-shock surcharge is $0.20 total.",
+      "timing": "Month 2 operating decisions / Month 3 budget"
+    },
+    {
+      "id": "R12",
+      "number": 12,
+      "chapter": 3,
+      "title": "Make your own sauce?",
+      "modules": "17: make-or-buy; 18: product costing",
+      "objective": "Distinguish relevant make-or-buy costs from capital expenditures and depreciation.",
+      "scenario": "Each meal uses one portion of sauce that currently costs $1.30 from the supplier. You could produce sauce for $0.80 per portion, incur $90 additional monthly fixed kitchen labor, and buy a $180 mixer depreciated over 60 months. A bulk vendor offers $1.05 per portion with a $200 one-time onboarding fee.",
+      "mastery_check": {
+        "prompt": "Ignoring the $180 initial cash purchase, at how many portions does making sauce break even on MONTHLY operating income (including $3 monthly depreciation)?",
+        "formula": "Make operating advantage per portion = $1.30 - $0.80 = $0.50; incremental monthly fixed cost = $90 + $180/60 = $93.",
+        "worked_solution": "$93 / $0.50 = 186 portions/month. Cash operating break-even would be 180, before considering the one-time $180 investment.",
+        "answer": 186,
+        "unit": "portions",
+        "tolerance": 0,
+        "feedback_for_wrong_answers": "Do not expense the full mixer purchase immediately. $90 fixed labor changes profit today; $180 is upfront cash and an equipment asset, allocated through depreciation over time."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Continue buying sauce",
+          "effect": "Keep sauce component at $1.30 per fulfilled meal; no fixed cost or capital purchase."
+        },
+        {
+          "id": "B",
+          "label": "Make sauce in-house",
+          "effect": "Set sauce component to $0.80 per meal; recurring incremental cash fixed kitchen labor $90/month starting Month 2; purchase mixer $180 PPE, 60-month zero-salvage life, $3/month depreciation."
+        },
+        {
+          "id": "C",
+          "label": "Negotiate bulk vendor pricing",
+          "effect": "Set sauce component to $1.05 per meal from Month 2; expense/pay a one-time $200 vendor onboarding fee; no extra monthly fixed cost."
+        }
+      ],
+      "accounting_posting": "For a mixer purchase post Dr PPE/Cr Cash; depreciate $3/month from its service month. Sauce cost flows through variable food expense on meals actually sold.",
+      "designer_notes": "Savings are per *all fulfilled meals*, including wrap, premium, delivery, and catering, except R21's separate corporate order is priced as an all-in case.",
+      "timing": "Month 2 operating decisions / Month 3 budget"
+    },
+    {
+      "id": "R13",
+      "number": 13,
+      "chapter": 3,
+      "title": "Find hidden product costs",
+      "modules": "19: activity-based costing; 20: overhead allocation",
+      "objective": "Allocate existing overhead by appropriate activity drivers without confusing allocated cost with incremental cash cost.",
+      "scenario": "For a self-contained ABC lesson, $1,200 of existing monthly support cost relates to 60 prep batches and $900 of existing support cost to 450 support contacts. Wraps use 1 prep batch per 25 wraps and 0.4 support contacts per wrap.",
+      "mastery_check": {
+        "prompt": "What is the ABC overhead assigned to one wrap?",
+        "formula": "Batch rate = 1200/60 = $20 per batch; contact rate = 900/450 = $2 per contact; per-wrap ABC = (1/25)*20 + 0.4*2.",
+        "worked_solution": "$0.80 batch support + $0.80 customer support = $1.60 allocated overhead per wrap.",
+        "answer": 1.6,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "The $1.60 is a cost allocation, not necessarily an avoidable cash expense from selling one more wrap. Do NOT add the $2,100 cost pools on top of the operating expenses already in the ledger."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Promote bowls",
+          "effect": "Spend/expense $100 once in Month 2; add 50 potential bowl orders in Month 2 only."
+        },
+        {
+          "id": "B",
+          "label": "Promote wraps",
+          "effect": "Spend/expense $100 once in Month 2; add 70 potential wrap orders in Month 2 only (only if wraps were added in Round 6)."
+        },
+        {
+          "id": "C",
+          "label": "No extra promotion",
+          "effect": "Leave the menu mix and monthly demand unchanged; calculate allocations for informational reporting only."
+        }
+      ],
+      "accounting_posting": "ABC allocation is managerial-reporting-only. Only actual $100 marketing choices have cash/P&L effects. Total company expense must be identical before and after a pure reallocation.",
+      "designer_notes": "Every player offers at least 10% wraps after Round 6, so all ABC and segment options remain meaningful.",
+      "timing": "Month 2 operating decisions / Month 3 budget"
+    },
+    {
+      "id": "R14",
+      "number": 14,
+      "chapter": 3,
+      "title": "Launch a premium menu item",
+      "modules": "17: incremental analysis; 21: target pricing",
+      "objective": "Account for cannibalization and the incremental costs of a new menu item.",
+      "scenario": "A gourmet bowl costs $7 variable per unit before supplier/sauce modifiers. A $16 version is forecast to attract 180 orders but replaces 70 regular bowls; a $14 version is forecast to attract 260 orders but replaces 150 regular bowls. Either launch incurs $250 one-time design/advertising.",
+      "mastery_check": {
+        "prompt": "At ordinary bowl CM $7, what is the incremental contribution of the $16 premium launch after its $250 setup, before capacity effects?",
+        "formula": "Incremental = premium Q*(premium price-premium variable cost) - displaced ordinary Q*ordinary bowl CM - setup.",
+        "worked_solution": "180*($16-$7) - 70*$7 - $250 = $1,620-$490-$250=$880.",
+        "answer": 880,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "A new product can appear more profitable than it actually is if part of its demand comes from customers who would otherwise buy the standard menu."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Launch $16 gourmet bowl",
+          "effect": "Add premium cohort with 180 monthly potential orders, price $16, baseline unit variable cost $7 plus live ingredient modifications; remove 70 potential regular bowls/month; expense/pay $250 launch cost in Month 2."
+        },
+        {
+          "id": "B",
+          "label": "Launch $14 value gourmet bowl",
+          "effect": "Add premium cohort with 260 monthly potential orders, price $14, baseline unit variable cost $7 plus modifications; remove 150 potential regular bowls/month; expense/pay $250 launch cost in Month 2."
+        },
+        {
+          "id": "C",
+          "label": "Delay premium launch",
+          "effect": "No premium orders or launch expense; preserve existing menu."
+        }
+      ],
+      "accounting_posting": "Only fulfilled premium orders create revenue/variable expense. One-time launch campaign is expensed. Apply constrained-capacity allocation before determining realized gain.",
+      "designer_notes": "The teaching case uses pre-shock baseline costs; the live game must incorporate Round 11 and 12 cost decisions when forecasting this investment.",
+      "timing": "Month 2 operating decisions / Month 3 budget"
+    },
+    {
+      "id": "R15",
+      "number": 15,
+      "chapter": 3,
+      "title": "Approve next month's operating budget",
+      "modules": "22: master/flexible budgets",
+      "objective": "Translate unit forecasts into a contribution-format operating budget and fund a management initiative.",
+      "scenario": "A reference monthly budget calls for 1,100 standard bowls at $12, variable cost $5/meal, and $5,900 fixed operating expense.",
+      "mastery_check": {
+        "prompt": "What is budgeted operating income in the reference case?",
+        "formula": "Budgeted income = budgeted units*(price - variable unit cost) - budgeted fixed operating costs.",
+        "worked_solution": "1,100*($12-$5)-$5,900 = $7,700-$5,900=$1,800.",
+        "answer": 1800,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "The budget is a PLAN, not actual revenue. After this choice, let the player lock a Month 3 forecast and show expected operating income; unexpected Month 3 events arrive next chapter."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Fund new advertising",
+          "effect": "Beginning Month 3, raise fixed cash advertising $200/month and forecast +130 potential regular orders/month."
+        },
+        {
+          "id": "B",
+          "label": "Fund food-waste training",
+          "effect": "Pay/expense $400 at the start of Month 3; halves the upcoming baseline waste surcharge in Round 17 from $0.20 to $0.10 per meal."
+        },
+        {
+          "id": "C",
+          "label": "Hold cash reserves",
+          "effect": "No additional planned expenditure or demand; keep costs steady."
+        }
+      ],
+      "accounting_posting": "At Round 15 close recognize Month 2 actual results only. The Month 3 initiative is scheduled and posted in Month 3, then the Month 3 static budget is frozen before demand shock.",
+      "designer_notes": "Checkpoint 3: include budget vs Month 2 actual, and freeze Month 3 planned units, mix, price, standards and fixed costs for variance analysis.",
+      "timing": "Month 2 operating decisions / Month 3 budget"
+    },
+    {
+      "id": "R16",
+      "number": 16,
+      "chapter": 4,
+      "title": "Sales slump!",
+      "modules": "22: flexible budgets; 23: sales-volume analysis",
+      "objective": "Separate lower activity volume from spending and pricing performance.",
+      "scenario": "A bad-weather episode reduces Month 3 price-sensitive walk-up demand by 12%. An instructional budget expected 1,100 meals, $7 contribution per meal; actual demand from the 12% reduction is 968 meals.",
+      "mastery_check": {
+        "prompt": "What is the sales-volume CONTRIBUTION variance (actual minus budgeted) in this example?",
+        "formula": "Sales-volume contribution variance = (actual units - budgeted units) * budgeted unit contribution margin.",
+        "worked_solution": "(968-1,100)*$7 = -$924, a $924 unfavorable volume variance.",
+        "answer": -924,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "A sales-volume variance is not the same thing as a material price variance or an unfavorable spending variance. Show the counterfactual results at the original planned activity level."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Shorten crew shifts temporarily",
+          "effect": "Reduce Month 3 cash payroll/fixed expense by $400; reduce Month 3 capacity by 100 units; restore both in Month 4."
+        },
+        {
+          "id": "B",
+          "label": "Emergency promotion",
+          "effect": "Spend/expense $200 only in Month 3; recover 140 potential regular meals in Month 3, subject to capacity."
+        },
+        {
+          "id": "C",
+          "label": "Ride out the weather",
+          "effect": "No new cost or demand response; actual activity stays depressed for Month 3 only."
+        }
+      ],
+      "accounting_posting": "Reduce only Month 3 demand, not all months. Apply temporary changes once and reverse before Month 4.",
+      "designer_notes": "Use the player's frozen budget standards for live variances; the 1,100-to-968 instructional example remains fixed for standardized mastery checking.",
+      "timing": "Month 3 operation and variance analysis"
+    },
+    {
+      "id": "R17",
+      "number": 17,
+      "chapter": 4,
+      "title": "Food waste and material variances",
+      "modules": "23: direct-material price and quantity variances",
+      "objective": "Calculate the materials price and usage variances and diagnose causes separately.",
+      "scenario": "A standalone audit finds 900 meals made. Standard recipe: 2.0 ingredient units/meal at $1.50/unit. Actual consumption: 1,980 ingredient units at $1.65/unit. The live business also faces a small Month 3 waste surcharge of $0.20 per fulfilled meal (or $0.10 if it trained in Round 15).",
+      "mastery_check": {
+        "prompt": "What is the TOTAL unfavorable direct-materials variance in the audit?",
+        "formula": "APV = (actual price - standard price)*actual quantity; AUV = (actual quantity - allowed standard quantity)*standard price.",
+        "worked_solution": "Allowed SQ=900*2=1,800. Price var=(1.65-1.50)*1,980=$297 U. Usage var=(1,980-1,800)*1.50=$270 U. Total=$567 U.",
+        "answer": 567,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "Unfavorable price variance and unfavorable quantity variance have different causes. Keep standard quantity at actual output, not original budgeted output."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Train food-prep employees",
+          "effect": "Spend/expense $180 once in Month 3; final waste cost surcharge becomes $0.05 per fulfilled meal for Month 3 onward."
+        },
+        {
+          "id": "B",
+          "label": "Renegotiate ingredient pricing",
+          "effect": "Spend/expense $200 once in Month 3; reduce non-sauce ingredient cost by $0.15 per meal from Month 3 onward; waste surcharge stays at $0.20 (or $0.10 if pre-trained)."
+        },
+        {
+          "id": "C",
+          "label": "Do nothing",
+          "effect": "Leave waste surcharge at $0.20/meal in Month 3 onward (or $0.10 if trained in Round 15); no new expense."
+        }
+      ],
+      "accounting_posting": "Live waste surcharges are added to actual variable ingredient cost; separate cash action fees are expensed. The fixed teaching case does not automatically inject an additional $567 into the live ledger.",
+      "designer_notes": "The optional ingredient renegotiation applies once; it does not cancel a separate supplier surcharge without being recorded explicitly.",
+      "timing": "Month 3 operation and variance analysis"
+    },
+    {
+      "id": "R18",
+      "number": 18,
+      "chapter": 4,
+      "title": "A labor-efficiency problem",
+      "modules": "23: labor rate and efficiency variances",
+      "objective": "Calculate direct-labor rate and efficiency variances using ACTUAL hours and standard hours for actual output.",
+      "scenario": "In a projected Month 3 staffing unit, standard labor is 180 hours at $20/hour ($3,600 budget). Without action, expected actual labor is 198 hours at $22/hour ($4,356), an incremental variance of $756 above baseline planned wages. You can intervene before the shift.",
+      "mastery_check": {
+        "prompt": "What is the total unfavorable labor variance for the projected shift?",
+        "formula": "Rate = (AR-SR)*AH; Efficiency=(AH-SH)*SR; sum = AH*AR - SH*SR.",
+        "worked_solution": "Rate=(22-20)*198=$396 U; efficiency=(198-180)*20=$360 U; total=$756 U.",
+        "answer": 756,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "Rate variance uses ACTUAL hours, not standard hours. The standard $3,600 wage bill is already part of baseline recurring payroll, so only the excess and interventions are incremental in the live month."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Targeted shift coaching",
+          "effect": "Pay/expense $220 once in Month 3; projected excess payroll above baseline falls from $756 to $456; total incremental cash operating cost $676."
+        },
+        {
+          "id": "B",
+          "label": "Bring in an experienced floater",
+          "effect": "Pay/expense $350 once in Month 3; projected excess payroll falls from $756 to $256; total incremental expense/cash cost $606."
+        },
+        {
+          "id": "C",
+          "label": "Absorb the overtime",
+          "effect": "Excess actual payroll is $756 above planned payroll; no intervention fee."
+        }
+      ],
+      "accounting_posting": "At Month 3 close, expense the chosen excess payroll and one-time intervention. Cash payments equal recognized labor and intervention expenses.",
+      "designer_notes": "Do not first book the full $756 and then also book the reduced $456/$256 excess; use the selected projected outcome only.",
+      "timing": "Month 3 operation and variance analysis"
+    },
+    {
+      "id": "R19",
+      "number": 19,
+      "chapter": 4,
+      "title": "Explain the monthly variances",
+      "modules": "22: static vs flexible budgets; 23: responsibility reports",
+      "objective": "Reconcile static-budget, flexible-budget and actual performance without attributing volume changes to cost managers.",
+      "scenario": "A reference budget for 1,000 meals at $12 price, $5 variable cost and $5,900 fixed overhead yields $1,100 operating income. Actual activity was 900 meals; a properly flexed budget gives $400. Suppose actual income is $250.",
+      "mastery_check": {
+        "prompt": "What is the $-amount of the UNFAVORABLE flexible-budget operating-income variance (actual minus flexible budget)?",
+        "formula": "Flexible budget income at actual volume = 900*($12-$5)-5900=400; flexible-budget variance = actual operating income - flexible budget income.",
+        "worked_solution": "$250 - $400 = -$150, or $150 unfavorable. The separate sales-volume variance is $400-$1,100 = -$700.",
+        "answer": -150,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "A decline in total profit from lower volume does not necessarily indicate poor spending control. Flexible budgets hold activity constant to compare the cost side properly."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Investigate the cost drivers",
+          "effect": "No immediate financial change; earn an analysis achievement if the student explains both the $700 volume variance and $150 flex variance."
+        },
+        {
+          "id": "B",
+          "label": "Cut marketing permanently",
+          "effect": "Beginning Month 4, decrease recurring marketing cash expense by $150/month; reduce future regular demand by 120 meals/month."
+        },
+        {
+          "id": "C",
+          "label": "Raise menu prices",
+          "effect": "Beginning Month 4, add $1 to bowl and wrap selling prices (and premium if active); reduce price-sensitive demand by 8%."
+        }
+      ],
+      "accounting_posting": "The fixed illustrative variance exercise is separate from the player's live variance report, which must use actual budget snapshots and fulfilled output.",
+      "designer_notes": "Never penalize an operations manager for a 12% weather-driven sales decline in the controllable-cost score.",
+      "timing": "Month 3 operation and variance analysis"
+    },
+    {
+      "id": "R20",
+      "number": 20,
+      "chapter": 4,
+      "title": "Drop the low-profit wrap?",
+      "modules": "24: segment reporting; 17: avoidable costs",
+      "objective": "Avoid dropping a profitable segment merely because allocated common fixed costs make reported segment income negative.",
+      "scenario": "A reference wrap segment sells 400 wraps at $10 each with $4.50 variable cost per wrap, direct avoidable fixed costs of $300, and allocated common overhead of $2,200. The overhead would continue if the segment were dropped.",
+      "mastery_check": {
+        "prompt": "How much total COMPANY operating profit is LOST by dropping wraps, assuming no replacement sales?",
+        "formula": "Lost segment margin = segment revenue - segment variable costs - avoidable fixed costs. Common allocated cost is irrelevant if unavoidable.",
+        "worked_solution": "400*($10-$4.50)-$300 = $2,200-$300=$1,900 decrease in company operating income if dropped.",
+        "answer": 1900,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "An allocated segment loss is not sufficient evidence to discontinue. Use contribution that would be lost minus costs actually avoided, and account for any replacement sales."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Keep the wrap line",
+          "effect": "Retain the selected wrap share, menu-support fixed cost and demand from Round 6."
+        },
+        {
+          "id": "B",
+          "label": "Discontinue wraps",
+          "effect": "From Month 4 onward, remove wrap orders/demand and any separately modeled avoidable recurring wrap-support fee; add 100 prospective replacement bowl orders/month; leave common shared overhead unchanged."
+        },
+        {
+          "id": "C",
+          "label": "Redesign the wrap recipe",
+          "effect": "Spend/expense $180 once in Month 4; lower variable wrap cost $0.60 per sold wrap, reduce wrap demand by 7% from Month 4 onward."
+        }
+      ],
+      "accounting_posting": "At month close post actual sales and variable expenses; after Round 20 restore Month 3 temporary weather/overtime effects before Month 4.",
+      "designer_notes": "If wraps are discontinued, remove the +100/+180 menu-driven demand boost from R6, turn wrap share to zero, reverse avoidable wrap-support fee, and add only the 100 specified replacement bowl prospects. Common overhead continues.",
+      "timing": "Month 3 operation and variance analysis"
+    },
+    {
+      "id": "R21",
+      "number": 21,
+      "chapter": 5,
+      "title": "Profitable... but short on cash",
+      "modules": "Financial statement analysis; 17: relevant financing",
+      "objective": "Reconcile cash and accrual profit, record accounts receivable, and evaluate early collection discounts.",
+      "scenario": "A one-time Month 4 corporate order has already been delivered using offsite capacity. Invoice price is $2,400, and all-in direct production costs paid now are $1,000. The client normally pays after Month 4. Alternatives provide immediate collection.",
+      "mastery_check": {
+        "prompt": "If the client does NOT pay by month-end, how much operating profit is earned from this invoice BEFORE other overheads?",
+        "formula": "Accrual gross contribution = revenue earned - production expense incurred, regardless of collection.",
+        "worked_solution": "$2,400 revenue - $1,000 cash-paid production cost = $1,400 profit contribution; A/R increases $2,400 while cash decreases $1,000.",
+        "answer": 1400,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "Net income and cash can move differently. A completed sale on credit creates revenue and receivable even though the bank account is still waiting."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Invoice at normal terms",
+          "effect": "Dr A/R 2,400 / Cr Sales 2,400; pay/expense $1,000 direct production; invoice remains outstanding at Month 4 end; cash received only in future period."
+        },
+        {
+          "id": "B",
+          "label": "Offer 2% early-payment discount",
+          "effect": "Collect $2,352 immediately; journal: Dr Cash 2,352; Dr Sales Discounts (contra-revenue) 48; Cr Sales Revenue 2,400. Recognize net sales of $2,352 and $1,000 direct production expense. No ending A/R for this invoice."
+        },
+        {
+          "id": "C",
+          "label": "Factor the invoice without recourse",
+          "effect": "Recognize $2,400 sales and $1,000 cost; transfer $2,400 A/R to a factor for $2,304 cash, expense $96 factoring fee; no ending A/R."
+        }
+      ],
+      "accounting_posting": "The invoice is a completed service outside the truck capacity model; the $1,000 is an incremental period variable expense, paid once. Never book it a second time at month close.",
+      "designer_notes": "Offer the early-discount choice as an explicit 2% reduction in revenue, not as an unexplained reduction in A/R.",
+      "timing": "Month 4 operations (close Month 4 at R23)"
+    },
+    {
+      "id": "R22",
+      "number": 22,
+      "chapter": 5,
+      "title": "The refrigerator breaks",
+      "modules": "Asset versus expense; depreciation",
+      "objective": "Classify a routine repair separately from purchasing an upgraded long-lived asset.",
+      "scenario": "Your existing refrigerator can be repaired for $650. Alternatively, install an additional upgraded $1,800 refrigeration system with a 36-month zero-residual life that saves $0.18 in spoilage per meal. Or rent a temporary equivalent refrigerator for $130 for Month 4.",
+      "mastery_check": {
+        "prompt": "If the new refrigerator costs $1,800 and lasts 36 months with no residual value, what is monthly straight-line depreciation?",
+        "formula": "Monthly depreciation = (capitalized cost - residual value) / useful months.",
+        "worked_solution": "$1,800/36 = $50/month.",
+        "answer": 50,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "Capitalizing ordinary repairs would overstate current profit. Buying a distinct multi-year asset does not make $1,800 an immediate operating expense."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Repair existing refrigerator",
+          "effect": "Cash -$650, Repairs Expense +$650 in Month 4; restore normal operating capacity; no new fixed asset."
+        },
+        {
+          "id": "B",
+          "label": "Install upgraded refrigeration",
+          "effect": "Cash -$1,800, PPE +$1,800; depreciate $50 from Month 4; reduce spoilage variable cost by $0.18 per actual sold meal from Month 4 onward."
+        },
+        {
+          "id": "C",
+          "label": "Rent a temporary unit",
+          "effect": "Expense/pay $130 in Month 4 for temporary rental; capacity restored for the month; no new asset or savings in per-meal cost."
+        }
+      ],
+      "accounting_posting": "Classify the purchase in PPE; depreciation reduces income but is noncash. Old truck assets remain in service; the game assumes no asset disposal or impairment.",
+      "designer_notes": "Every option maintains food safety and service capacity; the educational choice is cost classification and expected economics, not food safety.",
+      "timing": "Month 4 operations (close Month 4 at R23)"
+    },
+    {
+      "id": "R23",
+      "number": 23,
+      "chapter": 5,
+      "title": "Invest in faster preparation equipment",
+      "modules": "25: NPV; payback; depreciation",
+      "objective": "Evaluate a capital purchase using future incremental cash flows and differentiate NPV from accounting profit.",
+      "scenario": "A process improvement machine costs $2,400 today; it saves $1,050 CASH annually in operating costs for 3 years and can be sold for $300 at the end of Year 3. The required return is 10%. Salvage value for depreciation is also assumed $300. Alternative lease is $95/month for the same monthly $87.50 savings.",
+      "mastery_check": {
+        "prompt": "What is the project net present value (NPV), rounded to the nearest dollar?",
+        "formula": "NPV = -2,400 + SUM(1,050/(1.10)^t for t=1,2,3) + 300/(1.10)^3.",
+        "worked_solution": "PV yearly savings = $2,611.20; PV terminal value = $225.39; NPV = +$436.59, rounded +$437. Simple payback ignoring residual is 2.29 years.",
+        "answer": 437,
+        "unit": "USD",
+        "tolerance": 1,
+        "feedback_for_wrong_answers": "Use incremental future CASH flows for NPV; do not subtract depreciation from NPV cash flows. The $300 end-of-life residual occurs in Year 3, not each year."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Buy the machine",
+          "effect": "Buy $2,400 PPE now; record $300 residual value and depreciation ($2,400-$300)/36=$58.33/month from Month 4; save $87.50 monthly cash operating expense during modeled months."
+        },
+        {
+          "id": "B",
+          "label": "Month-to-month equipment rental",
+          "effect": "Take a cancellable month-to-month equipment rental for $95 cash/expense in Month 4, and realize $87.50 monthly operating cash cost savings; the simplified contract does not transfer title and creates no long-term committed lease."
+        },
+        {
+          "id": "C",
+          "label": "Keep the existing process",
+          "effect": "No investment or added cash savings."
+        }
+      ],
+      "accounting_posting": "Month 4: post machine acquisition (if bought), month-4 depreciation ($58.33), the $87.50 cost savings, or cancellable monthly rental cost ($95) if rented. Close all Month 4 operating transactions once at this checkpoint before Round 24.",
+      "designer_notes": "Close Month 4 after this round, before expansion planning. In actual accounting, non-cancellable leases may require right-of-use assets and liabilities under ASC 842; this option is specifically a cancellable short-term rental. The $300 residual cash comes at Year 3.",
+      "timing": "Month 4 operations (close Month 4 at R23)"
+    },
+    {
+      "id": "R24",
+      "number": 24,
+      "chapter": 5,
+      "title": "Should you open a second truck?",
+      "modules": "25: capital budgeting; investment vs financing",
+      "objective": "Calculate a project NPV independently from its financing method, and recognize loan proceeds as liabilities.",
+      "scenario": "A second truck costs $18,000 now. It is forecast to generate $6,500 of incremental UNLEVERED cash flow at each of the next four year-ends, plus $3,000 terminal resale cash at Year 4. Hurdle rate: 12%. A bank will finance 60% at 9% APR with 60 equal monthly payments beginning next month.",
+      "mastery_check": {
+        "prompt": "What is the NPV of opening the second truck, rounded to the nearest dollar?",
+        "formula": "NPV = -18,000 + SUM(6,500/(1.12)^t for t=1..4) + 3,000/(1.12)^4.",
+        "worked_solution": "PV annuity = $19,742.77; PV resale = $1,906.55; NPV = +$3,649.32, rounded +$3,649.",
+        "answer": 3649,
+        "unit": "USD",
+        "tolerance": 1,
+        "feedback_for_wrong_answers": "Financing affects liquidity and debt service, not the NPV of the unlevered project. Loan proceeds are not revenue. The same project NPV applies whether paid in cash or financed."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Buy the second truck with cash",
+          "effect": "After Month 4 close, at the beginning of Month 5: if current cash >= $20,000, purchase the $18,000 truck as PPE for cash; maintain a $2,000 minimum cash reserve. No new-truck Month 4 revenue or depreciation. Depreciate over 48 months with $3,000 salvage from Month 5 if future statements are shown."
+        },
+        {
+          "id": "B",
+          "label": "Finance 60% of the truck",
+          "effect": "After Month 4 close, at the beginning of Month 5: if cash >= $9,200, record PPE +$18,000, bank loan +$10,800, cash -$7,200; monthly payment ~$224.19 begins one month later. No new-truck Month 4 revenue/depreciation. $2,000 reserve required."
+        },
+        {
+          "id": "C",
+          "label": "Wait and build cash",
+          "effect": "Do not expand; preserve cash, debt capacity and equipment flexibility."
+        }
+      ],
+      "accounting_posting": "At acquisition, Dr PPE 18,000, Cr Cash 18,000 for cash route; financed route also Dr Cash 10,800 / Cr Loan 10,800. Interest begins after month-end. No future projections are falsely counted as current realized profits.",
+      "designer_notes": "Round 23 has already closed Month 4. Finance and ownership decisions are start-of-Month-5 transactions and do not retroactively change Month 4 results. Financing affects liquidity/debt service, not project unlevered NPV.",
+      "timing": "Start of Month 5, after Month 4 close"
+    },
+    {
+      "id": "R25",
+      "number": 25,
+      "chapter": 5,
+      "title": "Present to the investor committee",
+      "modules": "Financial statements; 14: strategy; 24: segment analysis",
+      "objective": "Read the completed financial statements, explain economic tradeoffs, and separate owner distributions, loan payments and prepaid costs from current operating profit.",
+      "scenario": "Investors want a reconciled Month 4 income statement, a current balance sheet, a cash-flow bridge, a dashboard of margins, and a one-paragraph recommendation supported by accounting data.",
+      "mastery_check": {
+        "prompt": "A business has $12,000 of assets and $4,000 of liabilities. What is book equity?",
+        "formula": "Assets = Liabilities + Equity; Equity = Assets - Liabilities.",
+        "worked_solution": "$12,000-$4,000=$8,000 book equity. An owner draw reduces cash and equity, not operating expense.",
+        "answer": 8000,
+        "unit": "USD",
+        "tolerance": 0.01,
+        "feedback_for_wrong_answers": "Book equity and cash are not synonyms, and an owner distribution does not decrease income. Current-period advertising expense also does not arise merely from paying in advance for next month."
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Distribute $1,000 to owner",
+          "effect": "If cash remains >=$2,000, post a $1,000 owner distribution: Dr Owner Distributions (contra-equity)/Cr Cash; current profit unchanged."
+        },
+        {
+          "id": "B",
+          "label": "Retain all current cash",
+          "effect": "No ledger change; show ability to fund payroll, equipment maintenance and future opportunities."
+        },
+        {
+          "id": "C",
+          "label": "Prepay $1,000 of next month's advertising",
+          "effect": "If cash remains >=$2,000, Dr Prepaid Advertising 1,000 / Cr Cash 1,000; not expensed until campaign is delivered next month."
+        }
+      ],
+      "accounting_posting": "Generate final 4-month P&L and cash-flow bridge from already-closed months. Update post-Month-4 balance sheet for any R24 capital purchase/loan and R25 distributions or prepayments; do not close Month 4 a second time.",
+      "designer_notes": "A post-close owner distribution reduces equity and cash, not Month 4 net income. Any prepaid Month 5 advertising is a current asset until consumed. Provide a restart and copyable report; do not collect personal information.",
+      "timing": "Start of Month 5, after Month 4 close"
+    }
+  ],
+  "bonus_challenges": [
+    {
+      "id": "B1",
+      "title": "Allocate overhead by preparation hours",
+      "topic": "20: cost allocation",
+      "scenario": "Existing shared monthly overhead is $1,800; bowls use 75 setup/prep hours and wraps use 25 hours.",
+      "mastery_check": {
+        "prompt": "How much overhead should the wraps receive if prep hours are the driver?",
+        "formula": "Rate = 1800/(75+25)=$18/hour; wraps overhead=25*$18.",
+        "worked_solution": "$450 wraps; $1,350 bowls; total reconciles to $1,800.",
+        "answer": 450
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Use preparation hours",
+          "effect": "Correct driver for the stated labor-preparation workload; managerial allocation only."
+        },
+        {
+          "id": "B",
+          "label": "Split overhead equally",
+          "effect": "Assign $900 to each line, despite different driver use; demonstrate distortion."
+        },
+        {
+          "id": "C",
+          "label": "Allocate by sales revenue",
+          "effect": "Allocate proportionally to revenue; results differ from the specified prep-hour basis."
+        }
+      ],
+      "feedback_for_wrong_answers": "Allocation redistributes an existing total; it does not create another $1,800 of expense."
+    },
+    {
+      "id": "B2",
+      "title": "One more employee at a step-cost threshold",
+      "topic": "15: step cost / CVP",
+      "scenario": "You can serve 900 meals; demand is 950. Incremental 50 meals have $7 contribution margin each, but adding a shift costs $400.",
+      "mastery_check": {
+        "prompt": "What is the incremental MONTHLY profit from hiring just for these 50 sales?",
+        "formula": "50*$7 -$400.",
+        "worked_solution": "-$50: reject the $400 shift on these facts unless benefits outside this month justify it.",
+        "answer": -50
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Hire additional shift",
+          "effect": "Serve 50 extra, $350 contribution, $400 cost, net -$50."
+        },
+        {
+          "id": "B",
+          "label": "Decline the extra 50",
+          "effect": "No additional contribution and no shift cost; profit $50 higher than A."
+        },
+        {
+          "id": "C",
+          "label": "Improve kitchen throughput",
+          "effect": "Hypothetical alternative: spend $200 for a one-time 50-meal efficiency boost; net +$150, if feasible."
+        }
+      ],
+      "feedback_for_wrong_answers": "The most sales is not automatically the most profit; thresholds matter."
+    },
+    {
+      "id": "B3",
+      "title": "Inventory is not automatically expensed",
+      "topic": "Financial accounting inventory / COGS",
+      "scenario": "The owner buys $1,000 ingredients before operating; $720 is used in meals sold, and $280 remains usable in inventory.",
+      "mastery_check": {
+        "prompt": "What is closing inventory?",
+        "formula": "Closing inventory=beginning inventory + purchases - ingredients consumed.",
+        "worked_solution": "0+1000-720=$280 inventory; $720 COGS; total cash spend $1,000.",
+        "answer": 280
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Record $280 closing inventory",
+          "effect": "Correct: recognize $720 expense and $280 asset."
+        },
+        {
+          "id": "B",
+          "label": "Expense all $1,000 now",
+          "effect": "Incorrect: understates inventory and profit by $280."
+        },
+        {
+          "id": "C",
+          "label": "Record $1,000 ending inventory",
+          "effect": "Incorrect: ignores $720 ingredients consumed in sold meals."
+        }
+      ],
+      "feedback_for_wrong_answers": "Cash outflows for buying inventory and expense recognition for ingredients used occur at different points."
+    },
+    {
+      "id": "B4",
+      "title": "Evaluate managers fairly",
+      "topic": "23: responsibility accounting",
+      "scenario": "A kitchen manager can influence food waste and shift schedules, but cannot control a citywide power rate increase or an unexpected storm.",
+      "mastery_check": {
+        "prompt": "How much of a $500 storm-driven sales shortfall is controllable by the kitchen manager without additional evidence?",
+        "formula": "Responsibility reports should isolate controllable items when evaluating the manager.",
+        "worked_solution": "$0 directly attributable as a controllable operating cost on the stated evidence.",
+        "answer": 0
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Focus on controllable waste and productivity",
+          "effect": "Correct: assess manager using relevant controllable measures."
+        },
+        {
+          "id": "B",
+          "label": "Penalize manager for the storm",
+          "effect": "Misattributes demand shock to a production supervisor."
+        },
+        {
+          "id": "C",
+          "label": "Ignore all performance measures",
+          "effect": "Fails to use useful operational data, even for controllable costs."
+        }
+      ],
+      "feedback_for_wrong_answers": "Responsibility accounting is about decision rights and controllability, not only arithmetic."
+    },
+    {
+      "id": "B5",
+      "title": "Stress-test the second truck",
+      "topic": "25: NPV sensitivity",
+      "scenario": "Second-truck cash inflows decline 15%, from $6,500 to $5,525 per year for 4 years. Project remains $18,000 initial investment, $3,000 Year-4 resale and 12% discount.",
+      "mastery_check": {
+        "prompt": "What is the stressed NPV rounded to dollars?",
+        "formula": "NPV=-18000+SUM(5525/1.12^t,t=1..4)+3000/1.12^4.",
+        "worked_solution": "$687.91, or +$688. Break-even annual CF ≈$5,298.52, a roughly 18.48% decline from original.",
+        "answer": 688
+      },
+      "options": [
+        {
+          "id": "A",
+          "label": "Invest: positive NPV",
+          "effect": "Correct on the simplified risk-adjusted known scenario, subject to liquidity and uncertainties."
+        },
+        {
+          "id": "B",
+          "label": "Reject because inflows declined",
+          "effect": "Incorrect: decline alone does not imply negative NPV."
+        },
+        {
+          "id": "C",
+          "label": "Ignore the sensitivity",
+          "effect": "Fails to compare expected value with downside conditions."
+        }
+      ],
+      "feedback_for_wrong_answers": "A positive NPV does not eliminate risk; present stress tests, risk tolerance, and liquidity separately."
+    }
+  ],
+  "source_boundary": "Source workbooks establish module themes; all challenges, cases, dollar figures and narratives are originally proposed for this game; do not republish textbook solutions.",
+  "period_close_rounds": {
+    "Month 1": "R10",
+    "Month 2": "R15",
+    "Month 3": "R20",
+    "Month 4": "R23"
+  },
+  "after_close_rounds": [
+    "R24",
+    "R25"
+  ]
+}
