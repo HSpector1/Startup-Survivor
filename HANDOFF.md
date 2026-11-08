@@ -18,11 +18,12 @@ Last writer: Claude (Opus 5.5), 2026-11-08
 - Three independent reviews ran: a spec audit with its own Python simulator (matches to the cent), a formula and terminology check against the Easton 7e workbooks, and per-screen self-checks by the UI builders. Their findings are resolved in `docs/IMPLEMENTATION_AUDIT.md` (A1 to A23).
 
 ## Independent review, 2026-11-08
-- Five small PRs are open for Claude to review and merge (#1 F/U attempt scoring, #2 Quick Challenge projections, #3 diagnostics, #4 dashboard pro forma, #5 mobile tables). Findings, what was verified and what was left as recommendations: `docs/REVIEW_2026-11-08.md`. No engine number changed.
+- PRs #1 to #6 (F/U attempt scoring, Quick Challenge projections, diagnostics, dashboard pro forma, mobile tables, review notes) were reviewed by Claude and merged to main on 2026-11-08 after a combined run: tsc clean, validator PASS, 437 Vitest, 16 Playwright. Findings, what was verified and what was left as recommendations: `docs/REVIEW_2026-11-08.md`. No engine number changed.
 
 ## Next step
 1. Team accounting review: read `docs/IMPLEMENTATION_AUDIT.md`, play one Full Career, and sign off or change the rules in its "Design observations for the team" section (dominated options R15B, R17B, R18A, R23B, and the 0.92 price response).
 2. Peer-review test on a phone: open the Pages link, run the Quick Challenge, note anything unclear.
+3. Open review recommendations (not yet built): see `docs/REVIEW_2026-11-08.md`, "Found, not fixed". The most useful is a multi-month column in the Full Career consequence table.
 
 ## Open decisions for the team
 - Price response to a $1 increase: the spec says 0.92, which makes raising prices always win. Recommend keeping 0.92 for submission (it is the approved spec) unless the team wants 0.88, a one-line change in `src/engine/model.ts` (R11B, R19C), followed by updating the expected values in `tests/engine/options.test.ts`.
