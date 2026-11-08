@@ -137,5 +137,20 @@ describe('wrong-answer diagnostics name the mistake that produces the value', ()
     has('R23', Math.round(npv(0.1, 2400, [1350, 1350, 1350]))); // resale every year, discounted
     has('R24', Math.round(npv(0.12, 18000, [6500, 6500, 6500, 6500], 3000) + 18000 - 10800)); // loan as investment
     has('R24', Math.round(npv(0.12, 18000, [6500, 6500, 6500, 6500], 3000) + 18000 - 7200));  // down payment as investment
+    has('R07', 0.25 * 12);                                 // the commission itself
+    has('R09', 120 * 7 - 650); has('R09', 120 * (7 - 2) - 650); // the hire; overtime profit less the hire
+    has('R12', 90 + 180 / 60);                             // the fixed cost, not divided by the saving
+    has('R17', 1980 * 1.65); has('R17', 1800 * 1.5);       // actual cost; standard cost allowed
+    has('R18', 198 * 22); has('R18', 180 * 20);            // actual cost; standard cost
+    has('R19', 900 * 7 - 5900); has('R19', 1000 * 7 - 5900); // flexible-budget income; static-budget income
+  });
+  it('a totals answer on a variance question gets its own diagnosis, not the generic miss', () => {
+    const spec = (id: 'R17' | 'R18' | 'R19') => {
+      const r = ROUNDS.find((x) => x.id === id)!;
+      return { answer: r.mastery_check.answer, tolerance: r.mastery_check.tolerance ?? 0, variance: OVERLAY[id].variance, mistakes: OVERLAY[id].mistakes };
+    };
+    expect(grade(spec('R17'), { value: 3267, label: 'U' }).message).toMatch(/actual materials cost/);
+    expect(grade(spec('R18'), { value: 4356, label: 'U' }).message).toMatch(/actual labor cost/);
+    expect(grade(spec('R19'), { value: 400, label: 'U' }).message).toMatch(/flexible-budget income itself/);
   });
 });
