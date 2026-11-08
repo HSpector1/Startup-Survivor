@@ -11,7 +11,7 @@ import {
 } from '../engine/ledger';
 import { monthlyDepreciation, periodLabel, varianceReport, type GameState, type MonthCalc, type Rescue } from '../engine/sim';
 import type { Save } from '../state';
-import { Delta, JournalView, Money, Sheet, Tabs, Variance, useFocusHeading } from './common';
+import { Delta, JournalView, Money, Sheet, TableScroll, Tabs, Variance, useFocusHeading } from './common';
 import { TruckHero, type TruckVariant } from './art';
 import './reports.css';
 
@@ -36,7 +36,7 @@ interface Row { label: ReactNode; vals?: Cell[]; kind?: 'head' | 'group' | 'sub'
 /** A statement table: row headers on the left, right-aligned amounts in each column. */
 function FinTable({ caption, cols, rows, first = 'Line item' }: { caption: ReactNode; cols: string[]; rows: Row[]; first?: string }) {
   return (
-    <div className="table-scroll">
+    <TableScroll>
       <table className="fin">
         <caption>{caption}</caption>
         <thead><tr><th scope="col">{first}</th>{cols.map((c) => <th scope="col" className="num" key={c}>{c}</th>)}</tr></thead>
@@ -51,7 +51,7 @@ function FinTable({ caption, cols, rows, first = 'Line item' }: { caption: React
           ))}
         </tbody>
       </table>
-    </div>
+    </TableScroll>
   );
 }
 
@@ -300,7 +300,7 @@ export function DemandTable({ calc, caption }: { calc: MonthCalc; caption?: stri
   const used = calc.capacity ? Math.round((calc.fulfilled / calc.capacity) * 100) : 0;
   return (
     <div className="stack">
-      <div className="table-scroll">
+      <TableScroll>
         <table className="fin">
           <caption>{caption ?? `Month ${calc.month} orders by customer group`}</caption>
           <thead>
@@ -324,7 +324,7 @@ export function DemandTable({ calc, caption }: { calc: MonthCalc; caption?: stri
             </tr>
           </tbody>
         </table>
-      </div>
+      </TableScroll>
       <div>
         <div className="bar capbar" role="img" aria-label={`Capacity used: ${calc.fulfilled} of ${calc.capacity} meals, ${used} percent`}>
           <span style={{ width: `${Math.min(used, 100)}%` }} />

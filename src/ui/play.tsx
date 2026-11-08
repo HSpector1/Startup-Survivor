@@ -8,7 +8,7 @@ import { CHAPTERS, CHAPTER_BLURB, OVERLAY, modulesOf, promptOf, roundById, worke
 import { effectSummary, insightFor } from '../content/insights';
 import { exportSave, chapterOf, gameInput, type Save } from '../state';
 import { ChapterIcon, TruckIcon } from './art';
-import { Delta, JournalView, Money, useFocusHeading } from './common';
+import { Delta, JournalView, Money, TableScroll, useFocusHeading } from './common';
 
 const OPTS: OptionId[] = ['A', 'B', 'C'];
 
@@ -260,7 +260,7 @@ export function ConsequenceView({ round, save, game, onContinue }: { round: Roun
       {m !== 0 && (
         <section className="card">
           <h2>How your choice compares <span className="tag forecast">Pro forma</span></h2>
-          <div className="table-scroll">
+          <TableScroll>
             <table className="fin">
               <caption className="sr-only">Projected Month {m} results under each option</caption>
               <thead><tr><th>Option</th><th className="num">Month {m} operating income</th><th className="num">Cash at Month {m} close</th><th className="num">Orders turned away</th></tr></thead>
@@ -275,7 +275,7 @@ export function ConsequenceView({ round, save, game, onContinue }: { round: Roun
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
           <p className="small muted" style={{ marginTop: '.75rem' }}>
             {mine.operatingIncome === bestIncome
               ? 'Your choice gives the highest projected operating income this month.'
@@ -331,7 +331,7 @@ export function CheckpointView({ chapter, save, game, onContinue }: { chapter: n
 
       <section className="card">
         <h2>Your chapter in review</h2>
-        <div className="table-scroll">
+        <TableScroll>
           <table className="fin">
             <caption className="sr-only">Decisions and knowledge-check points this chapter</caption>
             <thead><tr><th>Round</th><th>What you learned</th><th>Your decision</th><th className="num">Points</th></tr></thead>
@@ -350,7 +350,7 @@ export function CheckpointView({ chapter, save, game, onContinue }: { chapter: n
               })}
             </tbody>
           </table>
-        </div>
+        </TableScroll>
         <p className="small muted" style={{ marginTop: '.75rem' }}>Mastery points measure your accounting answers. Business results are judged separately, in the books.</p>
       </section>
 

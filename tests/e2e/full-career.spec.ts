@@ -60,6 +60,14 @@ test('full career on the reference path reproduces the validator to the cent', a
   await expect(till).toContainText('100 / 100'); // perfect mastery on the scripted path
   await expect(till).toContainText('Books balance');
   await expect(page.getByText('$28,315.10').first()).toBeVisible(); // equity after Month 4
+  // Wide statements: on a phone the four-month table scrolls sideways, says so, and is keyboard-focusable; on a desktop it fits.
+  const hints = page.getByText('Scroll sideways to see every column.');
+  if (test.info().project.name === 'mobile') {
+    await expect(hints.first()).toBeVisible();
+    await expect(page.getByRole('region', { name: /scrolls sideways/ }).first()).toHaveAttribute('tabindex', '0');
+  } else {
+    await expect(hints).toHaveCount(0);
+  }
   expect(errors).toEqual([]);
 });
 

@@ -10,7 +10,7 @@ import { fmt, type Cents } from '../engine/money';
 import { BONUS, BONUS_BEST, CHAPTERS, CHAPTER_BLURB, OVERLAY, ROUNDS, modulesOf, promptOf, roundById, workedOf, type Mistake, type SpecOption } from '../content/rounds';
 import { ASSUMPTIONS, GLOSSARY, SOURCES } from '../content/reference';
 import { DEFAULT_NAME, importSave, type Save } from '../state';
-import { useFocusHeading } from './common';
+import { TableScroll, useFocusHeading } from './common';
 import { ChapterIcon, TruckHero } from './art';
 
 const OPTION_IDS: OptionId[] = ['A', 'B', 'C'];
@@ -415,7 +415,7 @@ function Consequence({ r, choice, table }: { r: RoundId; choice: OptionId; table
   return (
     <section className="card stack" aria-labelledby={`${r}-cons`}>
       <h3 id={`${r}-cons`} ref={ref} tabIndex={-1}>Consequence: you chose {choice}, {label(choice)}</h3>
-      <div className="table-scroll">
+      <TableScroll>
         <table className="fin">
           <caption className="sr-only">Each option compared with your choice</caption>
           <thead>
@@ -439,7 +439,7 @@ function Consequence({ r, choice, table }: { r: RoundId; choice: OptionId; table
             ))}
           </tbody>
         </table>
-      </div>
+      </TableScroll>
       <p><strong>How the books record it:</strong> {round.accounting_posting}</p>
       <p className="callout"><strong>Coach:</strong> {OVERLAY[r].coach}</p>
       <p className="callout good">A choice that earns less this month is not automatically wrong. Cash cushions, capacity and risk can justify it. Defend your reasoning with the numbers above.</p>
@@ -510,7 +510,7 @@ function Summary({ title, kind, score, rows, extra, onExit, onAgain }: {
         <div className="kpi"><div className="label">Knowledge-check score</div><div className="value">{score} / 20</div></div>
         {extra}
       </div>
-      <div className="table-scroll">
+      <TableScroll>
         <table className="fin">
           <caption>Problem by problem</caption>
           <thead><tr><th scope="col">Problem</th><th scope="col" className="num">Points</th><th scope="col">How</th><th scope="col">Your decision</th></tr></thead>
@@ -525,7 +525,7 @@ function Summary({ title, kind, score, rows, extra, onExit, onAgain }: {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableScroll>
       <section className="card">
         <h2 className="x-h3">Concept recap</h2>
         <ul className="x-list">{rows.map((x) => <li key={x.id}><strong>{x.title}:</strong> {RECAP[x.id]}</li>)}</ul>
