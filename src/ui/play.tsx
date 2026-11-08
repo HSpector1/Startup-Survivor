@@ -99,7 +99,7 @@ function KnowledgeCheck({ round, record, onRecord, affects }: { round: RoundId; 
     setMsg({ ok: g.correct, text: g.message });
   }
 
-  const answerText = ov.variance ? `${fmt(Math.abs(mc.answer) * 100)} ${ov.variance}` : ov.unitLabel === '$' ? `${mc.answer < 0 ? '−' : ''}$${Math.abs(mc.answer).toLocaleString('en-US', { maximumFractionDigits: 3 })}` : `${mc.answer.toLocaleString('en-US')} ${ov.unitLabel}`;
+  const answerText = ov.variance ? `${fmt(Math.abs(mc.answer) * 100)} ${ov.variance}` : ov.unitLabel === '$' ? `${mc.answer < 0 ? '−' : ''}$${Math.abs(mc.answer).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 3 })}` : `${mc.answer.toLocaleString('en-US')} ${ov.unitLabel}`;
   const pts = points(record);
 
   return (
