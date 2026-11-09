@@ -39,26 +39,15 @@ Last writer: Claude (Opus 5.5), 2026-11-08
 
 ## Auto snapshot
 <!-- AUTO:BEGIN (handoff_guard.py rewrites this block) -->
-- Stamped: 2026-11-08 17:27 CST by **claude** on PreCompact (session 9b4daba4-6fcf-4f86-b37e-914b384edd3d)
-- Branch: `main` @ `9908a039b773e22301eef5a5a4bfeee22af2c0ee`
+- Stamped: 2026-11-08 18:28 CST by **claude** on PreCompact (session 9b4daba4-6fcf-4f86-b37e-914b384edd3d)
+- Branch: `main` @ `95ba85f7bb52109d0129d1608001f6ccbedf919c`
 - Upstream: `origin/main`, unpushed commits: 0
-- Uncommitted files: 12
-  - `D  Easton_Solutions_export.zip`
-  - ` M HANDOFF.md`
-  - ` M README.md`
-  - ` M docs/REVIEW_2026-11-08.md`
-  - ` M src/content/reference.ts`
-  - ` M src/engine/sim.ts`
-  - ` M src/ui/extras.tsx`
-  - ` M src/ui/play.tsx`
-  - ` M src/ui/reports.tsx`
-  - ` M src/ui/styles.css`
-  - ` M tests/e2e/full-career.spec.ts`
-  - ` M tests/engine/execution.test.ts`
+- Uncommitted files: 1
+  - `M HANDOFF.md`
 - Last commits:
+  - 95ba85f Build the review recommendations and fix dark mode
   - 9908a03 Record the merged review PRs in HANDOFF
   - fe4d27c Merge review/summary-notes (PR review by Claude)
   - fece71e Merge review/mobile-tables (PR review by Claude)
   - 241e4e1 Merge review/till-pro-forma-mastery (PR review by Claude)
-  - 24250d9 Merge review/diagnostics (PR review by Claude)
 <!-- AUTO:END -->
