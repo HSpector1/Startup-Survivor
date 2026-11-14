@@ -1,7 +1,7 @@
 // Financial reports, the month-close screen and the final investor report.
 // Every number comes from the posted journal or the engine's month calculation; nothing is re-derived here
 // except presentation splits (loan current portion) and cross-checks that render a red banner when they fail.
-import { useId, useState, type ReactNode } from 'react';
+import { useId, useMemo, useState, type ReactNode } from 'react';
 import { fmt, fmtUnits, pct, roundHalfUp, sum, type Cents } from '../engine/money';
 import { BRIDGE_RATE_MONTHLY, RESERVE_FLOOR, SECOND_TRUCK, type Month, type Period } from '../engine/model';
 import { amortization, loanPayment } from '../engine/finance';
@@ -10,7 +10,10 @@ import {
   type BalanceSheet, type ExpenseClass, type IncomeStatement, type JournalEvent,
 } from '../engine/ledger';
 import { monthlyDepreciation, periodLabel, varianceReport, type GameState, type MonthCalc, type Rescue } from '../engine/sim';
-import type { Save } from '../state';
+import { gameInput, type Save } from '../state';
+import { gradeBusiness } from '../engine/business';
+import { areasToImprove, businessStory, decisionReview, missedAnswers, studyReviewText } from '../content/review';
+import { AreasToImprove, DecisionsToReconsider, GradeCard, MissedAnswers } from './review';
 import { Delta, JournalView, Money, Sheet, TableScroll, Tabs, Variance, useFocusHeading } from './common';
 import { TruckHero, type TruckVariant } from './art';
 import './reports.css';
@@ -523,9 +526,16 @@ export function MonthCloseView({ month, game, truckName, onContinue, onRescue, o
 
 const TRUCK_SIZE: Record<string, TruckVariant> = { A: 'used', B: 'refurbished', C: 'premium' };
 
-export function FinalReport({ game, save, score, onRestart, onBonus }: { game: GameState; save: Save; score: number; onRestart: () => void; onBonus: () => void }) {
+export function FinalReport({ game, save, score, onRestart, onBonus, onGlossary }: { game: GameState; save: Save; score: number; onRestart: () => void; onBonus: () => void; onGlossary: (q: string) => void }) {
   const ref = useFocusHeading('final');
   const [copy, setCopy] = useState<{ ok: boolean; msg: string }>();
+  const bizGrade = useMemo(() => gradeBusiness(game), [game]);
+  const story = useMemo(() => businessStory(bizGrade, game, game.journal.some((e) => e.id === 'R24-secondTruck')), [bizGrade, game]);
+  // SIMULATION only: replays the game with one decision changed; the real ledger is untouched.
+  const insights = useMemo(() => decisionReview(gameInput(save), game), [game]); // eslint-disable-line react-hooks/exhaustive-deps
+  const study = studyReviewText(save.truckName, save.mastery, insights);
+  const missed = missedAnswers(save.mastery);
+  const areas = areasToImprove(save.mastery);
   const [armed, setArmed] = useState(false);
 
   const months = game.closes.map((c) => ({ m: c.month, calc: c.calc, cash: c.cashAfter, rescue: c.rescue, is: incomeStatement(inPeriod(game, c.month)) }));
@@ -573,6 +583,11 @@ export function FinalReport({ game, save, score, onRestart, onBonus }: { game: G
   const text = [
     `Startup Survivor investor report: ${save.truckName}`,
     `Accounting mastery: ${score}/100`,
+    `Business performance: ${bizGrade.letter}, ${bizGrade.title} (${bizGrade.score.toFixed(1)}/100). ${story.narrative}`,
+    ...bizGrade.dimensions.map((d) => `  ${d.label} ${d.points}/${d.max}: ${d.detail}`),
+    `Lessons: ${story.lessons.join(' ')}`,
+    `Areas to improve: ${areas.length ? areas.map((t) => `${t.topic.name} (${t.earned}/${t.max})`).join('; ') : 'none, every check right first time'}`,
+    `Missed or assisted questions: ${missed.length ? missed.map((m) => `R${m.number}`).join(', ') : 'none'}`,
     ...months.map((x) => `Month ${x.m}: net sales ${fmt(x.is.netSales)}, contribution margin ${fmt(x.is.contributionMargin)}, operating income ${fmt(x.is.operatingIncome)}, net income ${fmt(x.is.netIncome)}, ending cash ${fmt(x.cash)}`),
     `Four months: net sales ${fmt(total.netSales)}, operating income ${fmt(total.operatingIncome)}, net income ${fmt(total.netIncome)}`,
     `Final balance sheet: assets ${fmt(bsFinal.totalAssets)}, liabilities ${fmt(bsFinal.totalLiabilities)}, equity ${fmt(bsFinal.totalEquity)} (${bsFinal.balanced ? 'balances' : 'DOES NOT BALANCE'})`,
@@ -581,11 +596,11 @@ export function FinalReport({ game, save, score, onRestart, onBonus }: { game: G
     shown.join(' '),
   ].join('\n');
 
-  async function copyReport() {
+  async function copyReport(body = text, what = 'Report') {
     try {
       if (!navigator.clipboard) throw new Error('this browser blocks clipboard access on this page');
-      await navigator.clipboard.writeText(text);
-      setCopy({ ok: true, msg: 'Report copied.' });
+      await navigator.clipboard.writeText(body);
+      setCopy({ ok: true, msg: `${what} copied.` });
     } catch (e) {
       setCopy({ ok: false, msg: `Copy failed: ${(e as Error).message}. Open "Plain-text report" below and copy it by hand.` });
     }
@@ -604,6 +619,20 @@ export function FinalReport({ game, save, score, onRestart, onBonus }: { game: G
         </div>
         <TruckHero name={save.truckName} size={TRUCK_SIZE[save.choices.R01 ?? 'B']} className="final-art" />
       </header>
+
+      <section className="two results-duo" aria-label="Your two results">
+        <GradeCard grade={bizGrade} story={story} />
+        <div className="card mastery-card">
+          <h2>Accounting mastery</h2>
+          <p className="final-score">{score}<span className="muted">/100</span></p>
+          <p className="small muted">From the 25 knowledge checks: 4 points for a right first try without the hint, 2 after a hint or retry, 0 if revealed. This score is separate from business results.</p>
+          <p className="small" style={{ margin: 0 }}>{missed.length ? `${missed.length} ${missed.length === 1 ? 'check' : 'checks'} to review below.` : 'Every check right on the first try.'}</p>
+        </div>
+      </section>
+
+      <AreasToImprove mastery={save.mastery} onGlossary={onGlossary} />
+      <MissedAnswers mastery={save.mastery} onGlossary={onGlossary} />
+      <DecisionsToReconsider insights={insights} />
 
       <section className="card">
         <FinTable caption={<>Four-month results <Actual /></>} first="Measure" cols={[...months.map((x) => `Month ${x.m}`), 'Total']} rows={[
@@ -639,14 +668,9 @@ export function FinalReport({ game, save, score, onRestart, onBonus }: { game: G
         </section>
       )}
 
-      <section className="two">
+      <section>
         <div className="card">
-          <h2>Accounting mastery</h2>
-          <p className="final-score">{score}<span className="muted">/100</span></p>
-          <p className="small muted">From the 25 knowledge checks. This score is separate from business results.</p>
-        </div>
-        <div className="card">
-          <h2>Business performance</h2>
+          <h2>Cash and risk measures</h2>
           <dl className="diag">
             <dt>Cumulative operating income</dt><dd>{fmt(total.operatingIncome)}</dd>
             <dt>Ending cash</dt><dd>{fmt(bsFinal.cash)}</dd>
@@ -671,7 +695,8 @@ export function FinalReport({ game, save, score, onRestart, onBonus }: { game: G
 
       <div className="stack">
         <div className="btn-row">
-          <button className="btn" onClick={copyReport}>Copy report</button>
+          <button className="btn" onClick={() => copyReport()}>Copy report</button>
+          <button className="btn" onClick={() => copyReport(study, 'Study review')}>Copy study review</button>
           <button className="btn primary" onClick={onBonus}>Try the Mastery Lab</button>
           <button className="btn" onClick={() => (armed ? onRestart() : setArmed(true))} onBlur={() => setArmed(false)}>
             {armed ? 'Click again to erase this save' : 'Start a new company'}
@@ -681,6 +706,10 @@ export function FinalReport({ game, save, score, onRestart, onBonus }: { game: G
         <details>
           <summary>Plain-text report</summary>
           <textarea className="copy-text" readOnly value={text} aria-label="Plain-text report" rows={10} />
+        </details>
+        <details>
+          <summary>Plain-text study review</summary>
+          <textarea className="copy-text" readOnly value={study} aria-label="Plain-text study review" rows={10} />
         </details>
       </div>
     </div>

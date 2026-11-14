@@ -4,6 +4,8 @@
 
 export const GLOSSARY: {
   term: string;
+  /** Abbreviations and other names players search for. */
+  aliases?: string[];
   definition: string;
   formula?: string;
   example?: string;
@@ -46,6 +48,7 @@ export const GLOSSARY: {
   },
   {
     term: "Revenue recognition",
+    aliases: ["ASC 606"],
     definition:
       "You record revenue when you deliver the meal or service and earn the right to be paid, whether or not the customer has paid yet. A forecast or a budget is never revenue. (General idea behind ASC 606.)",
     example:
@@ -62,6 +65,7 @@ export const GLOSSARY: {
   },
   {
     term: "Accounts receivable",
+    aliases: ["A/R", "AR", "receivables"],
     definition:
       "Accounts receivable (A/R) is money customers owe you for sales you have already made on credit. It is an asset until the customer pays.",
     example:
@@ -121,6 +125,7 @@ export const GLOSSARY: {
   },
   {
     term: "Accumulated depreciation and net book value",
+    aliases: ["PPE", "PP&E", "property, plant and equipment", "NBV"],
     definition:
       "Accumulated depreciation is the total depreciation recorded on an asset so far. Net book value is the asset's cost minus that total, which is the amount still carried on the balance sheet.",
     formula: "Net book value = Cost - Accumulated depreciation",
@@ -138,6 +143,7 @@ export const GLOSSARY: {
   },
   {
     term: "Loan principal vs interest",
+    aliases: ["APR", "annual percentage rate", "amortization"],
     definition:
       "Principal is the amount you borrowed, and interest is the price of borrowing it. A payment reduces the liability by its principal part, and only the interest part is an expense.",
     formula: "Monthly interest = Loan balance x (APR / 12)",
@@ -147,6 +153,7 @@ export const GLOSSARY: {
   },
   {
     term: "Fixed cost",
+    aliases: ["fixed costs", "fixed and variable costs"],
     definition:
       "A fixed cost stays the same in total as the number of meals changes, within a normal range of activity. It falls per meal as you sell more.",
     example:
@@ -155,6 +162,7 @@ export const GLOSSARY: {
   },
   {
     term: "Variable cost",
+    aliases: ["variable costs", "fixed and variable costs"],
     definition:
       "A variable cost rises and falls in total with the number of meals you serve, and stays about the same per meal.",
     example:
@@ -180,6 +188,7 @@ export const GLOSSARY: {
   },
   {
     term: "Contribution margin and CM ratio",
+    aliases: ["CM", "unit contribution margin", "contribution margin ratio"],
     definition:
       "Contribution margin is what each meal contributes toward fixed costs and profit after its variable costs. The CM ratio shows that amount as a percentage of the selling price.",
     formula:
@@ -190,6 +199,7 @@ export const GLOSSARY: {
   },
   {
     term: "Weighted-average CM and sales mix",
+    aliases: ["WACM", "weighted CM"],
     definition:
       "Sales mix is the share of each product in total sales. Weighted-average contribution margin multiplies each product's unit CM by its share of the mix and adds the results.",
     formula: "Weighted CM = Sum of (Mix share x Unit CM)",
@@ -198,7 +208,18 @@ export const GLOSSARY: {
     rounds: ["R06", "R14", "R16"],
   },
   {
+    term: "Cost-volume-profit (CVP) analysis",
+    aliases: ["CVP", "cost volume profit"],
+    definition:
+      "CVP analysis shows how operating income changes when price, volume, variable cost per unit or fixed costs change. Break-even, target profit, margin of safety and sales mix are all CVP tools.",
+    formula: "Operating income = Units x (Price - Variable cost per unit) - Fixed costs",
+    example:
+      "At $12 a bowl, $5 of variable cost and $5,900 of fixed costs, 1,100 bowls earn 1,100 x $7 - $5,900 = $1,800. Selling 100 more bowls adds 100 x $7 = $700.",
+    rounds: ["R02", "R03", "R04", "R05", "R06"],
+  },
+  {
     term: "Break-even point",
+    aliases: ["BEP", "breakeven", "break even"],
     definition:
       "The break-even point is the number of meals at which operating income is exactly zero. Round up, because you cannot sell part of a meal.",
     formula: "Break-even units = Fixed costs / Unit contribution margin",
@@ -218,6 +239,7 @@ export const GLOSSARY: {
   },
   {
     term: "Relevant cost",
+    aliases: ["incremental cost", "differential cost", "avoidable cost"],
     definition:
       "A relevant cost or revenue differs between the alternatives you are comparing and happens in the future. Only relevant items belong in the decision.",
     example:
@@ -262,6 +284,7 @@ export const GLOSSARY: {
   },
   {
     term: "Activity-based costing, cost driver and allocation",
+    aliases: ["ABC", "activity-based costing", "overhead allocation", "cost pool"],
     definition:
       "Allocation spreads an existing shared cost across products. Activity-based costing (ABC) does that with a cost driver, the activity that causes the cost, such as prep batches. Allocation moves existing cost around and creates no new cash spending.",
     formula: "Rate = Cost pool / Total driver units",
@@ -291,6 +314,7 @@ export const GLOSSARY: {
   },
   {
     term: "Flexible-budget and sales-volume variances (favorable and unfavorable)",
+    aliases: ["favorable variance", "unfavorable variance", "F/U", "net sales volume variance"],
     definition:
       "The sales-volume variance is the part of the gap caused by selling more or fewer meals than planned. The flexible-budget variance is the part caused by revenue and cost performance at the actual volume. A favorable variance raises income above the benchmark and an unfavorable one lowers it.",
     formula:
@@ -301,8 +325,9 @@ export const GLOSSARY: {
   },
   {
     term: "Materials price and quantity variances",
+    aliases: ["APV", "AUV", "SQ", "price variance", "usage variance", "standard quantity allowed", "direct materials variance"],
     definition:
-      "The price variance compares what you paid per unit with the standard price. The quantity (usage) variance compares how much you used with the amount allowed for the meals you made. Look at them separately because different causes drive each.",
+      "The price variance compares what you paid per unit with the standard price. The quantity (usage) variance compares how much you used with the amount allowed for the meals you made. Look at them separately because different causes drive each. In Round 17's formula, APV is short for the materials price variance (actual price vs standard price) and AUV for the materials usage, or quantity, variance. APV here does not mean adjusted present value, a corporate-finance valuation method, and it is not NPV.",
     formula:
       "Price variance = (Actual price - Standard price) x Actual quantity; Quantity variance = (Actual quantity - Standard quantity allowed) x Standard price",
     example:
@@ -311,6 +336,7 @@ export const GLOSSARY: {
   },
   {
     term: "Labor rate and efficiency variances",
+    aliases: ["AH", "SH", "actual hours", "standard hours", "labor variance"],
     definition:
       "The rate variance compares the hourly wage you paid with the standard wage. The efficiency variance compares the hours you worked with the hours allowed for the output you produced.",
     formula:
@@ -339,6 +365,7 @@ export const GLOSSARY: {
   },
   {
     term: "Net present value (NPV) and hurdle rate",
+    aliases: ["NPV", "PV", "present value", "discount rate", "cost of capital"],
     definition:
       "NPV converts a project's future cash flows to today's dollars using your required return, the hurdle rate, and subtracts the investment. A positive NPV means the project earns more than the hurdle rate. Financing method does not change an unlevered project NPV.",
     formula:
@@ -506,3 +533,22 @@ export const SOURCES: { label: string; detail: string }[] = [
       "The game uses no real market data. All demand figures, prices, costs, rates and results are fictional and exist for teaching only. They are not predictions, and no real earnings or investment return is implied.",
   },
 ];
+
+export type GlossaryEntry = (typeof GLOSSARY)[number];
+
+/** Search by term, abbreviation, definition, formula or example. Name and abbreviation matches rank first. */
+export function searchGlossary(query: string): GlossaryEntry[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return GLOSSARY;
+  const names = (g: GlossaryEntry) => [g.term, ...(g.aliases ?? [])].map((x) => x.toLowerCase());
+  const rank = (g: GlossaryEntry) =>
+    names(g).some((n) => n === q) ? 0
+      : names(g).some((n) => n.includes(q)) ? 1
+      : `${g.definition} ${g.formula ?? ''} ${g.example ?? ''}`.toLowerCase().includes(q) ? 2 : 3;
+  return GLOSSARY.map((g) => ({ g, r: rank(g) })).filter((x) => x.r < 3).sort((a, b) => a.r - b.r).map((x) => x.g);
+}
+
+/** The most specific glossary entry for a round or bonus case: the one tagged with the fewest places. */
+export function glossaryFor(placeId: string): GlossaryEntry | undefined {
+  return GLOSSARY.filter((g) => g.rounds.includes(placeId)).sort((a, b) => a.rounds.length - b.rounds.length)[0];
+}

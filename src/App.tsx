@@ -2,11 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { CLOSE_AFTER, ROUND_IDS, type Month, type OptionId, type RoundId } from './engine/model';
 import { runGame, type Rescue } from './engine/sim';
 import { EMPTY_RECORD, points, type MasteryRecord } from './engine/scoring';
-import { chapterOf, gameInput, loadSave, newSave, nextRound, storeSave, type Save, type View } from './state';
+import { gameInput, loadSave, newSave, nextRound, questionKey, restartChapter as restartChapterSave, storeSave, type Save, type View } from './state';
 import { ReportsDialog, MonthCloseView, FinalReport } from './ui/reports';
 import { Landing, Setup, QuickChallenge, BonusLab, GlossaryPage, SourcesPage } from './ui/extras';
 import { RoundView, ConsequenceView, CheckpointView, Till } from './ui/play';
 import { Calculator } from './ui/calculator';
+import { GlossaryDialog } from './ui/glossary';
 
 export type Screen = 'landing' | 'setup' | 'play' | 'quick' | 'bonus' | 'glossary' | 'sources';
 
@@ -18,6 +19,13 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('landing');
   const [reportsOpen, setReportsOpen] = useState(false);
   const [calcOpen, setCalcOpen] = useState(false);
+  const [glossary, setGlossary] = useState<{ open: boolean; query: string }>({ open: false, query: '' });
+  // Calculator reset (owner feedback 2026-11-14): the key changes only when a different knowledge check is on screen.
+  // Each mode entry or new company bumps `run`, so the same round in a fresh run still counts as a new question.
+  const [run, setRun] = useState(0);
+  const [qKey, setQKey] = useState<string>();
+  const [subQuestion, setSubQuestion] = useState<string>();
+  const openGlossary = (query = '') => setGlossary({ open: true, query });
 
   useEffect(() => { setStoreError(storeSave(save)); }, [save]);
 
@@ -26,7 +34,16 @@ export default function App() {
 
   const go = (view: View) => setSave((s) => (s ? { ...s, view } : s));
 
-  function start(name: string, affects: boolean) { setSave(newSave(name, affects)); setLoadError(undefined); setScreen('play'); }
+  const liveQuestion = screen === 'play' ? questionKey('career', run, save?.view.kind === 'round' ? save.view.round : undefined)
+    : screen === 'quick' || screen === 'bonus' ? questionKey(screen, run, subQuestion) : undefined;
+  useEffect(() => { if (liveQuestion !== undefined) setQKey(liveQuestion); }, [liveQuestion]);
+  /** Enter a screen. Quick Challenge and Mastery Lab start a fresh run each time they open. */
+  function show(next: Screen) {
+    if ((next === 'quick' || next === 'bonus') && next !== screen) { setRun((n) => n + 1); setSubQuestion(undefined); }
+    setScreen(next);
+  }
+
+  function start(name: string, affects: boolean) { setSave(newSave(name, affects)); setRun((n) => n + 1); setLoadError(undefined); setScreen('play'); }
   function restart() { setSave(null); setScreen('setup'); }
 
   function recordMastery(r: RoundId, rec: MasteryRecord) {
@@ -69,13 +86,8 @@ export default function App() {
 
   /** Reload the snapshot taken when the current chapter began. */
   function restartChapter() {
-    setSave((s) => {
-      if (!s) return s;
-      const lastRound = ROUND_IDS.filter((r) => s.choices[r]).pop() ?? 'R01';
-      const ch = chapterOf(lastRound);
-      const snap = s.checkpoints[ch] ?? s.checkpoints[1]!;
-      return { ...s, choices: snap.choices, rescues: snap.rescues, mastery: snap.mastery, view: { kind: 'round', round: ROUND_IDS[(ch - 1) * 5] } };
-    });
+    setSave((s) => (s ? restartChapterSave(s) : s));
+    setRun((n) => n + 1); // discarded attempts must not leave their calculator work behind
   }
 
   const resumeLabel = save ? `Resume ${save.truckName}` : undefined;
@@ -86,7 +98,7 @@ export default function App() {
       <a className="skip" href="#main">Skip to content</a>
       <header className="topbar">
         <div className="topbar-inner">
-          <button className="brand" onClick={() => setScreen('landing')}>Startup <span>Survivor</span></button>
+          <button className="brand" onClick={() => show('landing')}>Startup <span>Survivor</span></button>
           {screen === 'play' && save && (
             <div className="progress" aria-label={`Progress: ${Object.keys(save.choices).length} of 25 rounds decided`}>
               {ROUND_IDS.map((r, i) => (
@@ -99,8 +111,9 @@ export default function App() {
           )}
           <div className="btn-row">
             <button className="btn" aria-expanded={calcOpen} aria-controls="calc-title" onClick={() => setCalcOpen((o) => !o)}>Calculator</button>
+            <button className="btn" aria-haspopup="dialog" onClick={() => openGlossary()}>Glossary</button>
             {screen === 'play' && save && <button className="btn" onClick={() => setReportsOpen(true)}>Open the books</button>}
-            {screen !== 'play' && save && <button className="btn primary" onClick={() => setScreen('play')}>{resumeLabel}</button>}
+            {screen !== 'play' && save && <button className="btn primary" onClick={() => show('play')}>{resumeLabel}</button>}
           </div>
         </div>
       </header>
@@ -113,15 +126,15 @@ export default function App() {
 
       <main id="main" tabIndex={-1} className="page">
         {screen === 'landing' && (
-          <Landing hasSave={!!save} resumeLabel={resumeLabel} onResume={() => setScreen('play')} onNew={() => setScreen('setup')}
-            onQuick={() => setScreen('quick')} onBonus={() => setScreen('bonus')} onGlossary={() => setScreen('glossary')} onSources={() => setScreen('sources')} />
+          <Landing hasSave={!!save} resumeLabel={resumeLabel} onResume={() => show('play')} onNew={() => show('setup')}
+            onQuick={() => show('quick')} onBonus={() => show('bonus')} onGlossary={() => show('glossary')} onSources={() => show('sources')} />
         )}
-        {screen === 'setup' && <Setup hasSave={!!save} onStart={start} onBack={() => setScreen('landing')}
-          onImported={(s) => { setSave(s); setLoadError(undefined); setScreen('play'); }} />}
-        {screen === 'quick' && <QuickChallenge onExit={() => setScreen('landing')} onCareer={() => setScreen(save ? 'play' : 'setup')} />}
-        {screen === 'bonus' && <BonusLab onExit={() => setScreen('landing')} />}
-        {screen === 'glossary' && <GlossaryPage onExit={() => setScreen('landing')} />}
-        {screen === 'sources' && <SourcesPage onExit={() => setScreen('landing')} />}
+        {screen === 'setup' && <Setup hasSave={!!save} onStart={start} onBack={() => show('landing')}
+          onImported={(s) => { setSave(s); setRun((n) => n + 1); setLoadError(undefined); setScreen('play'); }} />}
+        {screen === 'quick' && <QuickChallenge onExit={() => show('landing')} onCareer={() => show(save ? 'play' : 'setup')} onQuestion={setSubQuestion} />}
+        {screen === 'bonus' && <BonusLab onExit={() => show('landing')} onQuestion={setSubQuestion} />}
+        {screen === 'glossary' && <GlossaryPage onExit={() => show('landing')} />}
+        {screen === 'sources' && <SourcesPage onExit={() => show('landing')} />}
 
         {screen === 'play' && save && game && v && (
           <div className="play-grid">
@@ -137,7 +150,7 @@ export default function App() {
                   onContinue={() => afterClose(v.month)} onRescue={(k) => rescue(v.month, k)} onRestartChapter={restartChapter} />
               )}
               {v.kind === 'checkpoint' && <CheckpointView key={v.chapter} chapter={v.chapter} save={save} game={game} onContinue={() => afterCheckpoint(v.chapter)} />}
-              {v.kind === 'final' && <FinalReport game={game} save={save} score={score} onRestart={restart} onBonus={() => setScreen('bonus')} />}
+              {v.kind === 'final' && <FinalReport game={game} save={save} score={score} onRestart={restart} onBonus={() => show('bonus')} onGlossary={openGlossary} />}
             </div>
             <Till save={save} game={game} score={score} onOpenBooks={() => setReportsOpen(true)} />
           </div>
@@ -146,7 +159,8 @@ export default function App() {
 
       {save && game && <ReportsDialog open={reportsOpen} onClose={() => setReportsOpen(false)} game={game} truckName={save.truckName} />}
 
-      <Calculator open={calcOpen} onClose={() => setCalcOpen(false)} />
+      <Calculator open={calcOpen} onClose={() => setCalcOpen(false)} questionKey={qKey} />
+      <GlossaryDialog open={glossary.open} query={glossary.query} onClose={() => setGlossary((g) => ({ ...g, open: false }))} />
 
       <footer className="footer">
         Startup Survivor is an original teaching game for Auburn BUSI 7230. All businesses and numbers are fictional. No login, no tracking: progress stays in this browser.

@@ -5,10 +5,11 @@ import './extras.css';
 import { NEUTRAL, ROUND_IDS, type OptionId, type RoundId } from '../engine/model';
 import { availability, projectOption, runGame, type Choices } from '../engine/sim';
 import { incomeStatement } from '../engine/ledger';
-import { EMPTY_RECORD, grade, points, type CheckSpec, type MasteryRecord } from '../engine/scoring';
+import { EMPTY_RECORD, grade, points, recordAttempt, type CheckSpec, type MasteryRecord } from '../engine/scoring';
 import { fmt, type Cents } from '../engine/money';
-import { BONUS, BONUS_BEST, CHAPTERS, CHAPTER_BLURB, OVERLAY, ROUNDS, modulesOf, promptOf, roundById, workedOf, type Mistake, type SpecOption } from '../content/rounds';
-import { ASSUMPTIONS, GLOSSARY, SOURCES } from '../content/reference';
+import { BONUS, BONUS_BEST, CHAPTERS, CHAPTER_BLURB, OVERLAY, formulaOf, roundById, roundText, workedOf, type Mistake, type SpecOption } from '../content/rounds';
+import { ASSUMPTIONS, SOURCES } from '../content/reference';
+import { GlossaryList } from './glossary';
 import { DEFAULT_NAME, importSave, type Save } from '../state';
 import { TableScroll, useFocusHeading } from './common';
 import { ChapterIcon, TruckHero } from './art';
@@ -215,7 +216,7 @@ function Check({ id, prompt, format, unit, formula, worked, spec, fallback, reco
     if (!Number.isFinite(value)) { setMsg('Enter a plain number, such as 843 or -50.'); return; }
     const res = grade(spec, { value, label });
     // A right amount with no F/U picked is a prompt to finish the answer, not a failed attempt.
-    if (!res.incomplete) onRecord({ ...record, attempts: record.attempts + 1, correct: res.correct });
+    if (!res.incomplete) onRecord(recordAttempt(record, { value, label }, res.correct));
     setMsg(res.correct ? undefined : res.message ?? fallback ?? 'Not quite. Check each step of the formula.');
   }
 
@@ -370,6 +371,7 @@ function QuickProblem({ r, n, result, onChange, onNext, last }: {
   const ov = OVERLAY[r];
   const h = useFocusHeading(`quick-${r}`);
   const resolved = result.record.correct || result.record.revealed;
+  const text = roundText(round);
 
   const proj = useMemo(() => {
     try { return { table: projectQuick(r), avail: availability({ choices: priorChoices(r) }, r) }; } catch (e) { return { error: (e as Error).message }; }
@@ -380,12 +382,12 @@ function QuickProblem({ r, n, result, onChange, onNext, last }: {
       <header className="round-head">
         <div className="round-meta"><span>Problem {n} of 5</span><span aria-hidden="true">·</span><span>Round {round.number}, Chapter {round.chapter}</span><span className="tag">Reference business</span></div>
         <h1 ref={h} tabIndex={-1} className="x-h1">{round.title}</h1>
-        <p className="objective"><span className="muted">Objective:</span> {round.objective}</p>
-        <p className="small muted">Course modules: {modulesOf(round)}</p>
+        <p className="objective"><span className="muted">Objective:</span> {text.objective}</p>
+        <p className="small muted">Course modules: {text.modules}</p>
       </header>
-      <div className="panel"><h2 className="x-h3">Scenario</h2><p className="x-m0">{round.scenario}</p></div>
+      <div className="panel"><h2 className="x-h3">Scenario</h2><p className="x-m0">{text.scenario}</p></div>
 
-      <Check id={r} prompt={promptOf(round)} format={ov.format} unit={ov.unitLabel} formula={round.mastery_check.formula} worked={workedOf(round)}
+      <Check id={r} prompt={text.prompt} format={ov.format} unit={ov.unitLabel} formula={formulaOf(round)} worked={workedOf(round)}
         spec={{ answer: round.mastery_check.answer, tolerance: round.mastery_check.tolerance ?? 0, variance: ov.variance, mistakes: ov.mistakes }}
         fallback={round.mastery_check.feedback_for_wrong_answers} record={result.record} onRecord={(record) => onChange({ ...result, record })} />
 
@@ -461,8 +463,10 @@ function Consequence({ r, choice, table }: { r: RoundId; choice: OptionId; table
   );
 }
 
-export function QuickChallenge({ onExit, onCareer }: { onExit: () => void; onCareer: () => void }) {
+export function QuickChallenge({ onExit, onCareer, onQuestion }: { onExit: () => void; onCareer: () => void; onQuestion?: (q: string | undefined) => void }) {
   const [step, setStep] = useState(-1); // -1 intro, 0..4 problems, 5 summary
+  const [run, setRun] = useState(0);
+  useEffect(() => { onQuestion?.(step >= 0 && step < QUICK.length ? `${run}:${QUICK[step]}` : undefined); }, [step, run]); // eslint-disable-line react-hooks/exhaustive-deps
   const [results, setResults] = useState<QuickResult[]>(() => QUICK.map(() => ({ record: EMPTY_RECORD })));
   const total = results.reduce((s, x) => s + points(x.record), 0);
 
@@ -470,7 +474,7 @@ export function QuickChallenge({ onExit, onCareer }: { onExit: () => void; onCar
   if (step >= QUICK.length) {
     return <Summary title="Quick Challenge results" kind="quick" score={total}
       rows={QUICK.map((r, i) => ({ id: r, title: roundById(r).title, record: results[i].record, choice: results[i].choice ? `${results[i].choice}, ${roundById(r).options.find((o) => o.id === results[i].choice)?.label}` : 'none' }))}
-      onExit={onExit} onCareer={onCareer} onAgain={() => { setResults(QUICK.map(() => ({ record: EMPTY_RECORD }))); setStep(0); }} />;
+      onExit={onExit} onCareer={onCareer} onAgain={() => { setResults(QUICK.map(() => ({ record: EMPTY_RECORD }))); setRun((n) => n + 1); setStep(0); }} />;
   }
   return (
     <div className="stack">
@@ -604,9 +608,11 @@ function BonusCase({ n, result, onChange, onNext, last }: { n: number; result: B
   );
 }
 
-export function BonusLab({ onExit }: { onExit: () => void }) {
+export function BonusLab({ onExit, onQuestion }: { onExit: () => void; onQuestion?: (q: string | undefined) => void }) {
   const fresh = () => BONUS.map(() => ({ record: EMPTY_RECORD }) as BonusResult);
   const [step, setStep] = useState(-1);
+  const [run, setRun] = useState(0);
+  useEffect(() => { onQuestion?.(step >= 0 && step < BONUS.length ? `${run}:${BONUS[step].id}` : undefined); }, [step, run]); // eslint-disable-line react-hooks/exhaustive-deps
   const [results, setResults] = useState<BonusResult[]>(fresh);
   const h = useFocusHeading('bonus-intro');
   const total = results.reduce((s, x) => s + points(x.record), 0);
@@ -630,7 +636,7 @@ export function BonusLab({ onExit }: { onExit: () => void }) {
     return <Summary title="Mastery Lab results" kind="bonus" score={total}
       extra={<div className="kpi"><div className="label">Best judgment calls</div><div className="value">{judged} / {BONUS.length}</div></div>}
       rows={BONUS.map((b, i) => ({ id: b.id, title: b.title, record: results[i].record, choice: results[i].choice ?? 'none', best: results[i].choice ? results[i].choice === BONUS_BEST[b.id] : undefined }))}
-      onExit={onExit} onAgain={() => { setResults(fresh()); setStep(0); }} />;
+      onExit={onExit} onAgain={() => { setResults(fresh()); setRun((n) => n + 1); setStep(0); }} />;
   }
   return (
     <div className="stack">
@@ -647,38 +653,12 @@ export function BonusLab({ onExit }: { onExit: () => void }) {
 
 /* ================================================================ Glossary */
 
-const placeName = (id: string) => {
-  const r = ROUNDS.find((x) => x.id === id);
-  if (r) return `Round ${r.number}: ${r.title}`;
-  const b = BONUS.find((x) => x.id === id);
-  return b ? `Mastery Lab ${b.id}: ${b.title}` : id;
-};
-
 export function GlossaryPage({ onExit }: { onExit: () => void }) {
   const h = useFocusHeading('glossary');
-  const [q, setQ] = useState('');
-  const needle = q.trim().toLowerCase();
-  const list = GLOSSARY.filter((g) => !needle || `${g.term} ${g.definition} ${g.formula ?? ''}`.toLowerCase().includes(needle));
   return (
     <div className="stack x-narrow">
       <div className="btn-row x-between"><h1 ref={h} tabIndex={-1} className="x-m0">Glossary</h1><button className="btn" onClick={onExit}>Back to start</button></div>
-      <div className="field">
-        <label htmlFor="gloss-q">Search terms</label>
-        <input id="gloss-q" type="search" className="x-text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="For example: contribution margin" />
-      </div>
-      <p className="small muted" aria-live="polite">{list.length} of {GLOSSARY.length} terms</p>
-      {list.map((g) => (
-        <article key={g.term} className="card">
-          <h2 className="x-h3">{g.term}</h2>
-          <dl className="x-defs">
-            <dt>Definition</dt><dd>{g.definition}</dd>
-            {g.formula && <><dt>Formula</dt><dd className="formula">{g.formula}</dd></>}
-            {g.example && <><dt>Example</dt><dd>{g.example}</dd></>}
-            {g.rounds.length > 0 && <><dt>Where it appears</dt><dd>{g.rounds.map(placeName).join('; ')}</dd></>}
-          </dl>
-        </article>
-      ))}
-      {!list.length && <p>No term matches "{q}". Try a shorter word.</p>}
+      <GlossaryList />
     </div>
   );
 }

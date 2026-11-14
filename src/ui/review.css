@@ -1,0 +1,83 @@
+/* Final-report review sections and the glossary panel. Same tokens as styles.css. */
+
+/* ---------- grade placard ---------- */
+.grade-card { --g: var(--basil); border-top: 6px solid var(--g); }
+.grade-B { --g: #1f7a6d; }
+.grade-C { --g: var(--saffron-deep); }
+.grade-D { --g: #c0611b; }
+.grade-F { --g: var(--chili); }
+.grade-top { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 24px; align-items: center; }
+@media (max-width: 640px) { .grade-top { grid-template-columns: minmax(0, 1fr); justify-items: start; } }
+.grade-placard {
+  display: grid; justify-items: center; align-content: center; gap: .1rem; width: 168px; aspect-ratio: 4 / 5;
+  background: var(--surface); border: 5px solid var(--g); border-radius: 18px; padding: 10px;
+  box-shadow: 0 0 0 6px var(--surface), 0 0 0 8px var(--line), var(--shadow);
+  animation: stamp .55s cubic-bezier(.2, 1.4, .4, 1) both;
+}
+.grade-kicker { font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+.grade-letter { font-family: var(--display); font-weight: 800; font-size: 6.2rem; line-height: .95; color: var(--g); }
+.grade-score { font-weight: 700; font-size: .9rem; font-variant-numeric: tabular-nums; }
+.grade-eyebrow { margin: 0 0 .2rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.grade-copy h2 { margin-bottom: .4rem; }
+.grade-sub { font-size: 1.05rem; margin: 1.2rem 0 .5rem; }
+@keyframes stamp { from { transform: scale(1.35) rotate(-8deg); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.grade-dims { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 14px; }
+.grade-dims li { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-m); padding: 12px 14px; }
+.grade-dim-head { display: flex; justify-content: space-between; gap: .5rem; }
+.grade-meter { height: 10px; border-radius: 5px; background: var(--line); overflow: hidden; margin-top: .4rem; }
+.grade-meter > span { display: block; height: 100%; background: var(--g); transform-origin: left; animation: fill .9s .3s ease-out both; }
+@keyframes fill { from { transform: scaleX(0); } to { transform: none; } }
+
+.badges { list-style: none; padding: 0; margin: 0 0 .75rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 10px; }
+.badges li { display: grid; gap: .15rem; padding: 10px 12px; border-radius: var(--r-m); border: 2px solid var(--saffron-deep); background: var(--surface); }
+.badges li.earned strong::before { content: '★ '; color: var(--saffron-deep); }
+.badges li.locked { border-style: dashed; border-color: var(--line); color: var(--ink-2); }
+.badges li.locked strong::before { content: '☆ '; }
+
+.mastery-card .final-score { margin-top: .4rem; }
+
+/* ---------- areas and decisions ---------- */
+.areas { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; counter-reset: area; }
+.area { counter-increment: area; background: var(--paper); border: 1px solid var(--line); border-left: 5px solid var(--saffron); border-radius: var(--r-m); padding: 14px 16px; }
+.area h3 { margin: 0 0 .4rem; }
+.area h3::before { content: counter(area) '. '; color: var(--saffron-deep); }
+.area-head { display: flex; flex-wrap: wrap; gap: .5rem; align-items: baseline; justify-content: space-between; }
+.area .btn.ghost { padding-left: 0; }
+
+/* ---------- missed answers ---------- */
+.missed { display: grid; gap: 10px; }
+.missed-card { border: 1px solid var(--line); border-left: 5px solid var(--saffron-deep); border-radius: var(--r-m); background: var(--surface); }
+.missed-card.revealed { border-left-color: var(--chili); }
+.missed-card > summary { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .1rem .75rem; padding: 12px 14px; list-style: none; }
+.missed-card > summary::-webkit-details-marker { display: none; }
+.missed-card > summary::after { content: '+'; grid-column: 2; grid-row: 1; justify-self: end; font-weight: 800; }
+.missed-card[open] > summary::after { content: '−'; }
+.missed-round { font-family: var(--display); font-weight: 800; white-space: nowrap; }
+.missed-title { font-weight: 700; padding-right: 1.5rem; }
+.missed-meta { grid-column: 1 / -1; color: var(--ink-2); font-weight: 400; }
+.missed-body { padding: 0 14px 14px; }
+.missed-answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 12px; padding: 10px 12px; margin-bottom: .8rem; background: var(--paper); border-radius: var(--r-s); }
+.missed-body .btn.ghost { padding-left: 0; }
+
+/* ---------- glossary panel ---------- */
+dialog.sheet.sheet-side { width: min(720px, 100vw - 24px); }
+.gloss-chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.chip { min-height: 36px; padding: .25em .85em; border-radius: 999px; border: 1.5px solid var(--ink-2); background: var(--surface); font-weight: 700; font-size: .9rem; cursor: pointer; }
+.chip:hover { background: var(--panel); }
+.chip[aria-pressed='true'] { background: var(--saffron); border-color: var(--saffron); color: #1c2a2e; }
+.chip.ghost { border-color: transparent; text-decoration: underline; }
+.gloss-entry .x-defs { margin: 0; }
+
+/* grade card beside the mastery card on wide screens */
+.two.results-duo { grid-template-columns: minmax(0, 1fr); }
+
+/* top bar: three tools plus "Open the books" must fit a 375px phone */
+@media (max-width: 560px) {
+  .topbar-inner { flex-wrap: wrap; row-gap: .4rem; }
+  .topbar .btn-row { gap: .4rem; flex: 1 1 100%; min-width: 0; }
+  .topbar .btn { max-width: 100%; white-space: normal; }
+  /* Resume carries the truck name (up to 28 characters): give it its own row. */
+  .topbar .btn.primary { flex: 1 1 100%; }
+  .topbar .btn { padding: .3em .7em; font-size: .85rem; }
+}

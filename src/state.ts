@@ -99,5 +99,22 @@ export function gameInput(s: Pick<Save, 'choices' | 'rescues' | 'mastery' | 'mas
   return { choices: s.choices, rescues: s.rescues, execution: s.masteryAffectsSales ? executionFactors(s.mastery) : undefined };
 }
 
+/**
+ * Identity of the knowledge check on screen, for resetting the calculator. Undefined on screens without a question,
+ * so leaving and returning to the same question keeps the calculator's work.
+ * `run` changes when a new company starts or a mode is re-entered, so the same round in a new run counts as new.
+ */
+export function questionKey(mode: 'career' | 'quick' | 'bonus', run: number, question: string | undefined): string | undefined {
+  return question === undefined ? undefined : `${mode}:${run}:${question}`;
+}
+
+/** Restore the snapshot taken when the current chapter began. Attempts made since then are discarded. */
+export function restartChapter(s: Save): Save {
+  const lastRound = ROUND_IDS.filter((r) => s.choices[r]).pop() ?? 'R01';
+  const ch = chapterOf(lastRound);
+  const snap = s.checkpoints[ch] ?? s.checkpoints[1]!;
+  return { ...s, choices: snap.choices, rescues: snap.rescues, mastery: snap.mastery, view: { kind: 'round', round: ROUND_IDS[(ch - 1) * 5] } };
+}
+
 export const chapterOf = (r: RoundId) => Math.floor((Number(r.slice(1)) - 1) / 5) + 1;
 export const nextRound = (r: RoundId): RoundId | undefined => ROUND_IDS[ROUND_IDS.indexOf(r) + 1];

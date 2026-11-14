@@ -15,12 +15,24 @@ function fill(input: HTMLInputElement, value: string) {
   input.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
-export function Calculator({ open, onClose }: { open: boolean; onClose: () => void }) {
+/**
+ * `questionKey` names the knowledge check on screen (see questionKey in state.ts). When it changes, the expression,
+ * result, note and recent history clear, so one question's work never leaks into the next. It stays the same
+ * while the player works on one question, including trips to the glossary, the books or the landing page.
+ */
+export function Calculator({ open, onClose, questionKey }: { open: boolean; onClose: () => void; questionKey?: string }) {
   const [expr, setExpr] = useState('');
   const [result, setResult] = useState<{ value?: number; error?: string }>({});
   const [history, setHistory] = useState<{ expr: string; value: number }[]>([]);
   const [note, setNote] = useState<string>();
   const field = useRef<HTMLInputElement>(null);
+  const lastKey = useRef(questionKey);
+
+  useEffect(() => {
+    if (questionKey === lastKey.current) return;
+    lastKey.current = questionKey;
+    setExpr(''); setResult({}); setHistory([]); setNote(undefined);
+  }, [questionKey]);
 
   useEffect(() => {
     if (open) field.current?.focus();

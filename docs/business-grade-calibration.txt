@@ -1,0 +1,11 @@
+C  57.2  reference (lean, validator path)  [P15.8 L13.9 T7.5 R20]  ABBCCACCCCAACCCCCCAAAACBB
+D  48.2  reference, mastery all 2-pt (90%)  [P9.1 L11.3 T7.8 R20]  ABBCCACCCCAACCCCCCAAAACBB
+F  33.3  reference, all revealed (75%), keeps one truck  [P0 L7.2 T8.4 R17.7]  ABBCCACCCCAACCCCCCAAAACCB
+A  98.4  aggressive expansion  [P40 L20 T18.4 R20]  CCBAABABABBBAAABABCACBAAC
+F   8.7  cash-constrained + bridge loan  [P0 L0 T8.7 R0]  CAABCACAACAACCBCACBCAABCB
+F   8.7  cash-constrained + owner rescue  [P0 L0 T8.7 R0]  CAABCACAACAACCBCACBCAABCB
+C  61.2  all no-action (NEUTRAL)  [P17.1 L14.5 T9.6 R20]  ABBCCACCCCAACCCCCCAAACCCB
+A 100.0  strong conservative (greedy, keep one truck)  [P40 L20 T20 R20]  ACCABAACACCBAAABABCBBCCCB
+A 100.0  strong expansion (greedy, financed 2nd truck)  [P40 L20 T20 R20]  ACCABAACACCBAAABABCBBCCBB
+random legal games (1000): A 21.9%  B 37.0%  C 24.3%  D 13.9%  F 2.9%
+score percentiles p10/p25/p50/p75/p90: 43.3 / 56 / 70.5 / 83.2 / 90.5

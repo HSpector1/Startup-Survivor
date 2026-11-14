@@ -28,8 +28,19 @@ export function grade(spec: CheckSpec, a: Attempt): GradeResult {
   return { correct: false };
 }
 
-export interface MasteryRecord { attempts: number; hint: boolean; revealed: boolean; correct: boolean }
-export const EMPTY_RECORD: MasteryRecord = { attempts: 0, hint: false, revealed: false, correct: false };
+export interface MasteryRecord {
+  attempts: number; hint: boolean; revealed: boolean; correct: boolean;
+  /** Every graded answer in order (added 2026-11-14). Saves made earlier have no list: their answer values were never recorded. */
+  answers?: Attempt[];
+}
+export const EMPTY_RECORD: MasteryRecord = { attempts: 0, hint: false, revealed: false, correct: false, answers: [] };
+
+/** The record after one graded answer. Scoring reads only attempts/hint/revealed/correct; `answers` is for the learning review. */
+export function recordAttempt(r: MasteryRecord, a: Attempt, correct: boolean): MasteryRecord {
+  // An older record (no list) with earlier attempts keeps no list for those, so the review can say they were not recorded.
+  const answers = r.answers ?? (r.attempts === 0 ? [] : undefined);
+  return { ...r, attempts: r.attempts + 1, correct, answers: answers && [...answers, a.label ? { value: a.value, label: a.label } : { value: a.value }] };
+}
 
 /** 4 = right first try without the hint; 2 = right after a hint or a retry; 0 = answer revealed. */
 export function points(r: MasteryRecord | undefined): number {

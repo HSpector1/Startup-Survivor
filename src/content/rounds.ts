@@ -36,6 +36,8 @@ export interface Overlay {
   /** Variance questions are answered as a positive amount plus F/U, matching Easton's convention. */
   variance?: 'F' | 'U';
   prompt?: string;
+  /** Replaces the JSON hint formula when its shorthand would confuse students. */
+  formula?: string;
   worked?: string;
   modules?: string;
   mistakes?: Mistake[];
@@ -86,6 +88,7 @@ export const OVERLAY: Record<RoundId, Overlay> = {
     mistakes: [{ value: 1584, message: 'That uses the $12 price, which gives the revenue-based sales volume variance. This question asks for the contribution-based version, at $7 per meal.' }, { value: 132, message: 'That is the change in meals. Multiply it by the $7 budgeted contribution per meal.' }] },
   R17: { format: 'Amount and direction (F or U)', unitLabel: '$', variance: 'U',
     prompt: 'What is the total direct-materials variance in the audit (price variance + quantity variance)? Enter the amount and mark it F or U.',
+    formula: 'Materials price variance = (actual price − standard price) × actual quantity used; materials quantity (usage) variance = (actual quantity − standard quantity allowed for actual output) × standard price. (The source spec abbreviates these APV and AUV.)',
     worked: 'Standard quantity allowed = 900 meals × 2.0 = 1,800 units. Price variance = ($1.65 − $1.50) × 1,980 actual units used = $297 U. Quantity variance = (1,980 − 1,800) × $1.50 = $270 U. Total = $567 U. Under the just-in-time assumption, quantity purchased equals quantity used.',
     coach: 'Training attacks waste (a quantity problem). Renegotiating attacks price. They fix different causes.',
     mistakes: [{ value: 297, message: 'That is only the price variance. Add the quantity variance: (1,980 − 1,800) × $1.50 = $270.' }, { value: 270, message: 'That is only the quantity variance. Add the price variance: $0.15 × 1,980 = $297.' }, { value: 540, message: 'Price variance uses actual quantity (1,980), not standard quantity (1,800).' }, { value: 3267, message: 'That is total actual materials cost: 1,980 × $1.65. The variance compares it with the standard cost allowed, 1,800 × $1.50 = $2,700: $3,267 − $2,700 = $567 U.' }, { value: 2700, message: 'That is the standard cost allowed for 900 meals (1,800 units × $1.50). Subtract it from the actual $3,267 (1,980 × $1.65) to get the variance.' }] },
@@ -124,6 +127,41 @@ export const roundById = (id: RoundId) => ROUNDS.find((r) => r.id === id)!;
 export const promptOf = (r: RoundSpec) => OVERLAY[r.id].prompt ?? r.mastery_check.prompt;
 export const workedOf = (r: RoundSpec) => OVERLAY[r.id].worked ?? r.mastery_check.worked_solution;
 export const modulesOf = (r: RoundSpec) => OVERLAY[r.id].modules ?? r.modules;
+export const formulaOf = (r: RoundSpec) => OVERLAY[r.id].formula ?? r.mastery_check.formula;
+
+/** The correct answer as students see it, with F/U for variances. */
+export function answerTextOf(r: RoundSpec): string {
+  const ov = OVERLAY[r.id];
+  const a = r.mastery_check.answer;
+  const money = (n: number) => `$${Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 3 })}`;
+  if (ov.variance) return `${money(a)} ${ov.variance}`;
+  return ov.unitLabel === '$' ? `${a < 0 ? '−' : ''}${money(a)}` : `${a.toLocaleString('en-US')} ${ov.unitLabel}`;
+}
+
+/** Round text in reading order with each abbreviation spelled out at its first use. */
+export function roundText(r: RoundSpec) {
+  const [modules, objective, scenario, prompt] = expandFirstUse([modulesOf(r), r.objective, r.scenario, promptOf(r)]);
+  return { modules, objective, scenario, prompt };
+}
+
+/** Abbreviations spelled out the first time they appear in a round's text. */
+export const ABBREVIATIONS: Record<string, string> = {
+  ABC: 'activity-based costing', CVP: 'cost-volume-profit', NPV: 'net present value', CM: 'contribution margin',
+  PV: 'present value', APR: 'annual percentage rate', SQ: 'standard quantity', WACM: 'weighted-average contribution margin',
+};
+const ABBR_RE = new RegExp(`\\b(${Object.keys(ABBREVIATIONS).join('|')})\\b`, 'g');
+
+/** Expand each abbreviation at its first use across the texts, in order: "ABC" becomes "activity-based costing (ABC)". */
+export function expandFirstUse(texts: string[]): string[] {
+  const seen = new Set<string>();
+  return texts.map((t) => t.replace(ABBR_RE, (m: string, _g: string, at: number, all: string) => {
+    if (seen.has(m)) return m;
+    seen.add(m);
+    // Already spelled out, as in "net present value (NPV)": leave it alone.
+    if (all[at - 1] === '(') return m;
+    return `${ABBREVIATIONS[m]} (${m})`;
+  }));
+}
 
 /** Best judgment per bonus case. B2: declining (B) beats hiring (A) by $50, and the one-time $200 throughput fix (C) beats both at +$150, so C is best. */
 export const BONUS_BEST: Record<string, OptionId> = { B1: 'A', B2: 'C', B3: 'A', B4: 'A', B5: 'A' };

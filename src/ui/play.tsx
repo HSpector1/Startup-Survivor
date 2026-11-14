@@ -3,8 +3,8 @@ import { CLOSE_AFTER, NEUTRAL, ROUND_IDS, roundPeriod, type OptionId, type Round
 import { availability, projectOption, projectThroughMonth4, periodLabel, targetMonth, type GameState, type HorizonProjection, type Projection } from '../engine/sim';
 import { balanceSheet, incomeStatement } from '../engine/ledger';
 import { fmt } from '../engine/money';
-import { EXECUTION_BY_POINTS, FEEDS_MONTH, executionFactors, grade, points, resolved, type MasteryRecord } from '../engine/scoring';
-import { CHAPTERS, CHAPTER_BLURB, OVERLAY, modulesOf, promptOf, roundById, workedOf } from '../content/rounds';
+import { EXECUTION_BY_POINTS, FEEDS_MONTH, executionFactors, grade, points, recordAttempt, resolved, type MasteryRecord } from '../engine/scoring';
+import { CHAPTERS, CHAPTER_BLURB, OVERLAY, answerTextOf, formulaOf, roundById, roundText, workedOf } from '../content/rounds';
 import { effectSummary, insightFor } from '../content/insights';
 import { exportSave, chapterOf, gameInput, type Save } from '../state';
 import { ChapterIcon, TruckIcon } from './art';
@@ -24,6 +24,7 @@ export function RoundView({ round, save, game, record, onRecord, onDecide }: {
   const input = gameInput(save);
   const insight = useMemo(() => insightFor(round, input, game), [round, game]); // eslint-disable-line react-hooks/exhaustive-deps
   const ready = resolved(record);
+  const text = roundText(spec);
 
   return (
     <article className="stack" aria-labelledby="round-title">
@@ -38,13 +39,13 @@ export function RoundView({ round, save, game, record, onRecord, onDecide }: {
           </div>
         </div>
         <h1 id="round-title" ref={head} tabIndex={-1}>{spec.title}</h1>
-        <p className="objective"><span className="muted">Learning goal:</span> {spec.objective}</p>
-        <p className="small muted" style={{ margin: 0 }}>Course topics: {modulesOf(spec)}</p>
+        <p className="objective"><span className="muted">Learning goal:</span> {text.objective}</p>
+        <p className="small muted" style={{ margin: 0 }}>Course topics: {text.modules}</p>
       </header>
 
       <section className="card" aria-labelledby="story">
         <h2 id="story" className="sr-only">The situation</h2>
-        <p style={{ fontSize: '1.08rem', margin: 0 }}>{spec.scenario}</p>
+        <p style={{ fontSize: '1.08rem', margin: 0 }}>{text.scenario}</p>
       </section>
 
       {insight && (
@@ -65,7 +66,7 @@ export function RoundView({ round, save, game, record, onRecord, onDecide }: {
         </section>
       )}
 
-      <KnowledgeCheck round={round} record={record} onRecord={onRecord} affects={!!save.masteryAffectsSales} />
+      <KnowledgeCheck round={round} prompt={text.prompt} record={record} onRecord={onRecord} affects={!!save.masteryAffectsSales} />
 
       <section aria-labelledby="decide" className="stack">
         <div>
@@ -80,7 +81,7 @@ export function RoundView({ round, save, game, record, onRecord, onDecide }: {
   );
 }
 
-function KnowledgeCheck({ round, record, onRecord, affects }: { round: RoundId; record: MasteryRecord; onRecord: (r: MasteryRecord) => void; affects: boolean }) {
+function KnowledgeCheck({ round, prompt, record, onRecord, affects }: { round: RoundId; prompt: string; record: MasteryRecord; onRecord: (r: MasteryRecord) => void; affects: boolean }) {
   const spec = roundById(round);
   const ov = OVERLAY[round];
   const mc = spec.mastery_check;
@@ -95,11 +96,11 @@ function KnowledgeCheck({ round, record, onRecord, affects }: { round: RoundId; 
     if (value.trim() === '' || !Number.isFinite(n)) { setMsg({ ok: false, text: 'Enter a number, for example 1250 or 6.63.' }); return; }
     const g = grade({ answer: mc.answer, tolerance: mc.tolerance ?? 0, variance: ov.variance, mistakes: ov.mistakes }, { value: n, label });
     // A right amount with no F/U picked is a prompt to finish the answer, not a failed attempt.
-    if (!g.incomplete) onRecord({ ...record, attempts: record.attempts + 1, correct: g.correct });
+    if (!g.incomplete) onRecord(recordAttempt(record, { value: n, label }, g.correct));
     setMsg({ ok: g.correct, text: g.message });
   }
 
-  const answerText = ov.variance ? `${fmt(Math.abs(mc.answer) * 100)} ${ov.variance}` : ov.unitLabel === '$' ? `${mc.answer < 0 ? '−' : ''}$${Math.abs(mc.answer).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 3 })}` : `${mc.answer.toLocaleString('en-US')} ${ov.unitLabel}`;
+  const answerText = answerTextOf(spec);
   const pts = points(record);
 
   return (
@@ -108,7 +109,7 @@ function KnowledgeCheck({ round, record, onRecord, affects }: { round: RoundId; 
         <h2 id="check" style={{ margin: 0 }}>Knowledge check</h2>
         <span className="tag practice">Practice case: standard numbers, not your business</span>
       </div>
-      <p style={{ marginTop: '.75rem', fontWeight: 600 }}>{promptOf(spec)}</p>
+      <p style={{ marginTop: '.75rem', fontWeight: 600 }}>{prompt}</p>
 
       {!done && (
         <form className="check-form" onSubmit={submit} noValidate>
@@ -136,7 +137,7 @@ function KnowledgeCheck({ round, record, onRecord, affects }: { round: RoundId; 
         </form>
       )}
 
-      {record.hint && !done && <p className="formula" style={{ marginTop: '1rem' }}><strong>Hint:</strong> {mc.formula}</p>}
+      {record.hint && !done && <p className="formula" style={{ marginTop: '1rem' }}><strong>Hint:</strong> {formulaOf(spec)}</p>}
 
       <div id={`fb-${round}`} className="feedback" role="status" aria-live="polite">
         {!done && msg && !msg.ok && (
@@ -151,7 +152,7 @@ function KnowledgeCheck({ round, record, onRecord, affects }: { round: RoundId; 
               <strong>{record.correct && !record.revealed ? 'Correct.' : 'Here is the answer.'}</strong> {answerText}
               <span className="muted small"> · {pts} of 4 mastery points</span>
             </p>
-            <p className="formula" style={{ margin: '.4rem 0' }}>{mc.formula}</p>
+            <p className="formula" style={{ margin: '.4rem 0' }}>{formulaOf(spec)}</p>
             <p style={{ margin: 0 }}>{workedOf(spec)}</p>
             {(!record.correct || record.revealed || record.attempts > 1) && <p className="small muted" style={{ margin: '.5rem 0 0' }}>{mc.feedback_for_wrong_answers}</p>}
             {affects && FEEDS_MONTH(spec.number) > 0 && (

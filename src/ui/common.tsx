@@ -1,5 +1,5 @@
 // Small shared presentational pieces used by every screen.
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode, useId } from 'react';
 import { fmt, type Cents } from '../engine/money';
 import { ACCOUNTS, type JournalEvent } from '../engine/ledger';
 
@@ -85,18 +85,23 @@ export function JournalView({ events, empty }: { events: JournalEvent[]; empty?:
 }
 
 /** Modal sheet built on <dialog> so focus trapping and Escape come from the browser. */
-export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
+export function Sheet({ open, onClose, title, children, className = '' }: { open: boolean; onClose: () => void; title: string; children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
-    if (open && !d.open) d.showModal();
+    if (open && !d.open) {
+      d.showModal();
+      // React's autoFocus fires before the dialog opens, so focus the marked field once it can take focus.
+      d.querySelector<HTMLElement>('[data-autofocus]')?.focus();
+    }
     if (!open && d.open) d.close();
   }, [open]);
   return (
-    <dialog ref={ref} className="sheet" onClose={onClose} aria-labelledby="sheet-title">
+    <dialog ref={ref} className={`sheet ${className}`} onClose={onClose} aria-labelledby={titleId}>
       <div className="sheet-head">
-        <h2 id="sheet-title" style={{ margin: 0 }}>{title}</h2>
+        <h2 id={titleId} style={{ margin: 0 }}>{title}</h2>
         <button className="btn" onClick={onClose}>Close</button>
       </div>
       <div className="sheet-body">{open ? children : null}</div>

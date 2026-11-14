@@ -18,7 +18,19 @@ An accounting simulation for Auburn University BUSI 7230, Cost Analysis and Syst
 | Quick Challenge | 5 rounds (R04, R10, R17, R19, R24), 5 to 8 minutes | Peer reviewers. Uses a fixed reference business. |
 | Mastery Lab | 5 optional harder cases (B1 to B5) | Extra practice. Never touches the live ledger. |
 
-The game also includes a calculator (top bar, every screen: parentheses, powers for NPV, percent, and "Use in answer"), a glossary of 41 terms and a Sources & Assumptions page.
+The game also includes a calculator (top bar, every screen: parentheses, powers for NPV, percent, and "Use in answer"; it clears itself when you move to a different question), a glossary of 41 terms (a Glossary button in the top bar opens it in every mode, searchable by name or abbreviation, without leaving the question) and a Sources & Assumptions page.
+
+## The final report
+
+The investor report ends a Full Career with two separate results and a study guide:
+
+- **Accounting mastery**: the existing score out of 100 from the 25 knowledge checks.
+- **Business performance**: a letter grade A to F with a title (Food Truck Mogul, Savvy Entrepreneur, Surviving Startup, Struggling Operator, Financial Meltdown), a short explanation, the four scored dimensions, lessons and business badges. It scores Months 1-4 only: profitability 40 points, liquidity 20, trajectory 20, resilience 20, with A at 85+, B 66+, C 50+, D 35+. Financing and the start-of-Month-5 moves never count as earnings or losses, and a business that needed a rescue cannot rate above C. Audit rule A26 lists the thresholds and the calibration (the validator's reference path rates C; strong conservative and strong expansion paths both rate A).
+- **Your areas to improve**: up to three subjects ranked by knowledge-check points lost, each with a review, formula, worked example and what to practice.
+- **Review your missed answers**: an expandable card for every check you missed, retried, solved with the hint or revealed, with your recorded answers, the correct answer (with F/U), the worked solution and a glossary link.
+- **Business decisions to reconsider**: up to three decisions where a simulated replay with one choice changed would have earned at least $500 more in Months 1-4, with the cash and capacity tradeoffs. It is labeled a simulation and never changes your results.
+
+"Copy report" now includes the grade and the review summary; "Copy study review" copies the study guide alone.
 
 ## Mastery affects sales
 
@@ -49,8 +61,9 @@ npm run validate:py  # the original Python reference validator
 
 - `docs/startup_survivor_validation.py` passes (28 worked examples, 4 month-end reconciliations).
 - The engine reproduces the validator's reference path to the cent, including the R24 financed balance sheet.
+- Vitest also covers the business grade (reference, aggressive, rescued and randomized paths), answer history and old saves, the learning and decision reviews, glossary search and the calculator's question key (`tests/engine/review.test.ts`).
 - Vitest covers all 75 options against hand-computed values, 300 randomized legal games (balanced books after every event, no double-sold capacity, closed months immutable), three full-game paths (lean, aggressive, constrained cash with rescue), and an independent recomputation of all 30 worked answers.
-- Playwright plays the full career and the Quick Challenge on desktop and mobile, checks keyboard-only play and save/resume.
+- Playwright plays the full career and the Quick Challenge on desktop and mobile, checks keyboard-only play and save/resume, the calculator reset in all three modes, the glossary panel (Escape, focus, answer kept) and the final report's grade, review cards and export (`tests/e2e/improvements.spec.ts`).
 
 ## Repository map
 

@@ -1,10 +1,18 @@
 # HANDOFF
 
-Last writer: Claude (Opus 5.5), 2026-11-08
+Last writer: Claude (Opus 5.5), 2026-11-14
 
 ## Where the work is
 - Repo / branch: `HSpector1/Startup-Survivor`, branch `main`. Every push to `main` runs the tests and deploys to GitHub Pages: https://hspector1.github.io/Startup-Survivor/
 - Required reading, in order: `README.md`, `docs/IMPLEMENTATION_AUDIT.md` (every accounting rule the specs left open), `CLAUDE.md`, then the specs in `docs/`.
+
+## Update 2026-11-14: four teammate-feedback improvements
+- Calculator clears (expression, result, note, history) when a different knowledge check appears in Full Career, Quick Challenge or Mastery Lab; it keeps its work within one question, including trips to the glossary, books or landing page. Key: `questionKey` in `src/state.ts`, reset effect in `src/ui/calculator.tsx`.
+- Glossary button in the top bar on every screen opens a searchable modal panel (`src/ui/glossary.tsx`, native `<dialog>`: Escape closes, focus returns, the answer underneath is untouched). Search covers names and abbreviations (`aliases` in `src/content/reference.ts`). New CVP entry. "APV" exists only in the R17 spec formula and means the materials price variance; the R17 hint now spells it out (audit A28). Abbreviations are expanded at first use in each round's text.
+- Business Performance grade A to F on the final report (`src/engine/business.ts`, audit A26, calibration in `docs/business-grade-calibration.txt`). Reference path rates C 57.2; strong conservative and strong expansion paths rate A.
+- Learning review on the final report (`src/content/review.ts`, `src/ui/review.tsx`, audit A27): areas to improve, expandable missed-answer cards from the new `answers` history in mastery records (old saves show "not recorded"), and up to three simulated business decisions to reconsider. Copy report includes the grade and review; Copy study review copies the study guide.
+- Tests: `tests/engine/review.test.ts` (25 Vitest cases), `tests/e2e/improvements.spec.ts` (5 Playwright cases, desktop and mobile). No engine number, posting rule or mastery scoring rule changed.
+- Verified locally 2026-11-14 before push: validator PASS, `tsc` clean, Vitest 465 passed, build OK, Playwright 28 passed (desktop 1440 and mobile 375, served from `dist/` on port 4174 because another project held 4173). The full-career run still ends at the validator's $6,715.10 cash and $28,315.10 equity.
 
 ## State (verified 2026-11-08)
 - Game complete and playable: Full Career (25 rounds, 4 month closes, checkpoints, save/resume/export/import), Quick Challenge (5 rounds), Mastery Lab (B1 to B5), glossary (41 terms), Sources & assumptions, investor report.
@@ -21,6 +29,7 @@ Last writer: Claude (Opus 5.5), 2026-11-08
 - PRs #1 to #6 (F/U attempt scoring, Quick Challenge projections, diagnostics, dashboard pro forma, mobile tables, review notes) were reviewed by Claude and merged to main on 2026-11-08 after a combined run: tsc clean, validator PASS, 437 Vitest, 16 Playwright. Findings, what was verified and what was left as recommendations: `docs/REVIEW_2026-11-08.md`. No engine number changed.
 
 ## Next step
+0. Owner review of the business-grade thresholds (audit A26). The validator's reference path rates C (Surviving Startup) because it earns $3,315 over four months with a Month 3 loss, below the median random legal game ($6,666). Moving it to B means lowering the B cutoff from 66 to about 57, one line in `RUBRIC.cutoffs`, then rerunning `npx vite-node scripts/calibrate-business-grade.ts` and updating the pinned values in `tests/engine/review.test.ts`.
 1. Team accounting review: read `docs/IMPLEMENTATION_AUDIT.md`, play one Full Career, and sign off or change the rules in its "Design observations for the team" section (dominated options R15B, R17B, R18A, R23B, and the 0.92 price response).
 2. Peer-review test on a phone: open the Pages link, run the Quick Challenge, note anything unclear.
 3. Review recommendations 1 to 5 are built (2026-11-08): multi-month comparison (audit A25), R18 fixed-cost variance note, factoring presentation note, valid HTML option cards, Easton zip removed from the tree. Dark mode top bar and dashboard contrast fixed. Only the team's design decisions and the optional history purge remain.
